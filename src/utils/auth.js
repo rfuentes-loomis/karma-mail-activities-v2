@@ -168,7 +168,6 @@ export const handleAuth = async () => {
     });
 
     try {
-      //TODO replace with env
       // eslint-disable-next-line no-undef
       const response = await fetch(
         process.env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT,

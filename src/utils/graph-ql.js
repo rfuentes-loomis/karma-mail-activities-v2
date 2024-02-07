@@ -1,4 +1,4 @@
-import { api } from "../../axiosConfig";
+import { api } from "./axiosConfig";
 import { EnumType, jsonToGraphQLQuery } from "json-to-graphql-query";
 
 export const request = (query) => {

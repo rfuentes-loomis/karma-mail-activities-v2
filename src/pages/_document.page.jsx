@@ -15,8 +15,10 @@ export default function Document() {
           />
         )}
         <script
+          async
           type="text/javascript"
           src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
+          crossOrigin="anonymous"
         ></script>
         {process.env.NODE_ENV !== "production" && (
           <script
