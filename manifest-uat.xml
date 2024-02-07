@@ -8,8 +8,8 @@
   <Version>1.0.0.0</Version>
   <ProviderName>loomis</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Loomis Activity Plugin" />
-  <Description DefaultValue="Loomis Activity Plugin" />
+  <DisplayName DefaultValue="Loomis Activity Plugin UAT" />
+  <Description DefaultValue="Loomis Activity Plugin UAT" />
   <IconUrl DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-64.png" />
   <HighResolutionIconUrl DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-128.png" />
   <SupportUrl DefaultValue="https://www.loomis.com/help" />

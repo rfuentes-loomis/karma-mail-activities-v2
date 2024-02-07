@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "uat-manifest": "./bash-scripts/create-manifest.sh manifest-uat.xml 'https://karma-mail-api.azurewebsites.net' '82d1df69-d8ea-4fd1-985c-87a7ac41dac3' 'api://karma-mail-api.azurewebsites.net/82d1df69-d8ea-4fd1-985c-87a7ac41dac3'",
+    "uat-manifest": "./bash-scripts/create-manifest.sh manifest-uat.xml 'https://karma-mail-api.azurewebsites.net' '82d1df69-d8ea-4fd1-985c-87a7ac41dac3' 'api://karma-mail-api.azurewebsites.net/82d1df69-d8ea-4fd1-985c-87a7ac41dac3' UAT",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
