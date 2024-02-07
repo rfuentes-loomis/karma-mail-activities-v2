@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "start:prod": "node server.js",
     "start:local": "node ./server.js",
     "lint": "next lint"
   },
