@@ -58,7 +58,9 @@ jobs:
           cp -r ./build/static ./build/standalone/build
           cp -r ./public ./build/standalone
       - name: Build Deployment Package
-        run: zip -r release.zip ./build/standalone
+        run: |
+        cd ./build/standalone
+        zip -r ../../release.zip .
       - name: "Deploy to Azure Web App"
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
