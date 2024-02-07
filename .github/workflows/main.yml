@@ -16,44 +16,6 @@ env:
   AZURE_AD_SCOPES: ${{ secrets.AZURE_AD_SCOPES }}
   AZURE_BACKEND_PUBLISH_PROFILE: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
 jobs:
-  build_deploy_frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        # setup nodejs environment
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-        # cache the dependencies to speed up the build
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: .env file setup
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          envkey_REACT_APP_DHARMA_API: ${{ env.REACT_APP_DHARMA_API }}
-          envkey_REACT_APP_USER_TOKEN_ENDPOINT: ${{ env.REACT_APP_USER_TOKEN_ENDPOINT }}
-          directory: "./addin"
-          file_name: ".env"
-          fail_on_empty: false
-          sort_keys: false
-
-      - name: Build & Deploy Frontend
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ env.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: "upload"
-          app_location: "./addin"
-          output_location: "dist"
-          skip_app_build: false
-          skip_api_build: true
-
   build_deploy:
     runs-on: ubuntu-latest
     steps:
@@ -82,7 +44,7 @@ jobs:
           envkey_AZURE_AD_SCOPES: ${{ env.AZURE_AD_SCOPES }}
           envkey_NEXT_PUBLIC_DHARMA_API: ${{ env.NEXT_PUBLIC_DHARMA_API }}
           envkey_NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
-          directory: "./backend-api"
+          directory: "."
           file_name: ".env"
           fail_on_empty: false
           sort_keys: false
