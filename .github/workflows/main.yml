@@ -7,7 +7,6 @@ env:
   # common
   NODE_VERSION: "20.9.0"
   AZURE_BACKEND_WEBAPP_NAME: karma-mail-api
-  BACKEND_PORT_PORT: 3000
   NEXT_PUBLIC_DHARMA_API: ${{ secrets.NEXT_PUBLIC_DHARMA_API }}
   NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ secrets.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
   AZURE_AD_SECRET: ${{ secrets.AZURE_AD_SECRET }}
@@ -37,7 +36,6 @@ jobs:
       - name: .env file setup
         uses: SpicyPizza/create-envfile@v2.0
         with:
-          envkey_BACKEND_PORT_PORT: ${{ env.BACKEND_PORT_PORT }}
           envkey_AZURE_AD_SECRET: ${{ env.AZURE_AD_SECRET }}
           envkey_AZURE_AD_CLIENTID: ${{ env.AZURE_AD_CLIENTID }}
           envkey_AZURE_AD_TENANTID: ${{ env.AZURE_AD_TENANTID }}

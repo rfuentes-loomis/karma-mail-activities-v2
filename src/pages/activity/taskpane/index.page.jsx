@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import * as React from "react";
 import { request, applyMutation } from "../../../utils/graph-ql";
 import { useMutation, useQuery } from "react-query";
@@ -15,7 +15,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
-import Loading from "../../../common/Loading";
+import Loading from "../../../common/loading";
 import {
   toTrimAndLowerCase,
   extractNameFromEmail,
