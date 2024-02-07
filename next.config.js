@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: false,
   pageExtensions: ["page.jsx", "page.js"],
-  experimental:{
-  }
+  distDir: "build",
+  output: "standalone",
 };
 
 module.exports = nextConfig;
