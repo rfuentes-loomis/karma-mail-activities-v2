@@ -118,8 +118,12 @@ export const handleAuth = async () => {
 
   return null;
 };
-
-async function getAccessToken(authorization) {
+/**
+ * Used by API 
+ * @param {*} authorization 
+ * @returns 
+ */
+export async function getAccessToken(authorization) {
   if (!authorization) {
     throw new Error("No Authorization header was found.");
   } else {
