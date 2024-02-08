@@ -28,6 +28,7 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       {/* https://learn.microsoft.com/en-us/answers/questions/1070090/using-office-javascript-api-in-next-js */}
+      {/* Local dev hack */}
       {process.env.NODE_ENV !== "production" && (
         <Script
           id="store_replaceState"
@@ -43,6 +44,7 @@ export default function App({ Component, pageProps }) {
         crossOrigin="anonymous"
         onLoad={() => setLoadedOffice(true)}
       ></Script>
+      {/* Local dev hack */}
       {process.env.NODE_ENV !== "production" && loadedOffice && (
         <Script
           id="assign_replaceState"
@@ -54,11 +56,7 @@ export default function App({ Component, pageProps }) {
       <ThemeProvider theme={Theme}>
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            {loadedOffice ? (
-              <Component {...pageProps} />
-            ) : (
-              <Loading isLoading />
-            )}
+            {loadedOffice ? <Component {...pageProps} /> : <Loading center isLoading={true} />}
           </LocalizationProvider>
         </QueryClientProvider>
       </ThemeProvider>

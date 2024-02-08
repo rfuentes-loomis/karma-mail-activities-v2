@@ -3,8 +3,7 @@ let form = require("form-urlencoded");
 import * as https from "https";
 import { JwksClient } from "jwks-rsa";
 
-const DISCOVERY_KEYS_ENDPOINT =
-  "https://login.microsoftonline.com/common/discovery/v2.0/keys";
+const DISCOVERY_KEYS_ENDPOINT = "https://login.microsoftonline.com/common/discovery/v2.0/keys";
 const domain = "graph.microsoft.com";
 const version = "v1.0";
 
@@ -20,11 +19,7 @@ function getSigningKeys(header, callback) {
 
 async function verifyToken(token, key, validationOptions) {
   if (!token) return {};
-  return new Promise((resolve, reject) =>
-    jwt.verify(token, key, validationOptions, (err, decoded) =>
-      err ? reject(() => err) : resolve(decoded)
-    )
-  );
+  return new Promise((resolve, reject) => jwt.verify(token, key, validationOptions, (err, decoded) => (err ? reject(() => err) : resolve(decoded))));
 }
 
 async function validateJwt(authHeader) {
@@ -85,7 +80,46 @@ async function getGraphData(accessToken, apiUrl, queryParams) {
   });
 }
 
-export async function getAccessToken(authorization) {
+/**
+ * Calls Office auth getAccessToken & authenticates user on backend
+ * @returns MS User with access token
+ */
+export const handleAuth = async () => {
+  try {
+    // eslint-disable-next-line no-undef
+    const accessToken = await Office.auth.getAccessToken({
+      allowSignInPrompt: true,
+      allowConsentPrompt: true,
+      forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
+    });
+
+    try {
+      // eslint-disable-next-line no-undef
+      const response = await fetch(process.env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      // eslint-disable-next-line no-undef
+      console.error("Error:", error);
+      throw error;
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-undef
+    console.error("Error obtaining token", error);
+    throw error;
+  }
+
+  return null;
+};
+
+async function getAccessToken(authorization) {
   if (!authorization) {
     throw new Error("No Authorization header was found.");
   } else {
@@ -94,9 +128,7 @@ export async function getAccessToken(authorization) {
     const [, /* schema */ assertion] = authorization.split(" ");
 
     const tokenScopes = jwt.decode(assertion).scp.split(" ");
-    const accessAsUserScope = tokenScopes.find(
-      (scope) => scope === "access_as_user"
-    );
+    const accessAsUserScope = tokenScopes.find((scope) => scope === "access_as_user");
     if (!accessAsUserScope) {
       throw new Error("Missing access_as_user");
     }
@@ -115,41 +147,24 @@ export async function getAccessToken(authorization) {
     const tokenURLSegment = "oauth2/v2.0/token";
     const encodedForm = form(formParams);
 
-    const tokenResponse = await fetch(
-      `${stsDomain}/${tenant}/${tokenURLSegment}`,
-      {
-        method: "POST",
-        body: encodedForm,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    const tokenResponse = await fetch(`${stsDomain}/${tenant}/${tokenURLSegment}`, {
+      method: "POST",
+      body: encodedForm,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
     const json = await tokenResponse.json();
     if (json.error) {
-      throw new Error(
-        "Error Code: " +
-          json.error +
-          "; Microsoft Graph error " +
-          JSON.stringify(json)
-      );
+      throw new Error("Error Code: " + json.error + "; Microsoft Graph error " + JSON.stringify(json));
     }
     const graphToken = json.access_token;
     const graphUrlSegment = process.env.GRAPH_URL_SEGMENT || "/me";
     const graphQueryParamSegment = process.env.QUERY_PARAM_SEGMENT || "";
-    const graphData = await getGraphData(
-      graphToken,
-      graphUrlSegment,
-      graphQueryParamSegment
-    );
+    const graphData = await getGraphData(graphToken, graphUrlSegment, graphQueryParamSegment);
     if (graphData?.code) {
-      throw new Error(
-        "Error Code: " +
-          graphData?.code +
-          "; Microsoft Graph error " +
-          JSON.stringify(graphData)
-      );
+      throw new Error("Error Code: " + graphData?.code + "; Microsoft Graph error " + JSON.stringify(graphData));
     } else {
       return graphData;
     }
@@ -157,39 +172,3 @@ export async function getAccessToken(authorization) {
     return json;
   }
 }
-
-export const handleAuth = async () => {
-  try {
-    // eslint-disable-next-line no-undef
-    const accessToken = await Office.auth.getAccessToken({
-      allowSignInPrompt: true,
-      allowConsentPrompt: true,
-      forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
-    });
-
-    try {
-      // eslint-disable-next-line no-undef
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT,
-        {
-          method: "GET", // or 'PUT'
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      // eslint-disable-next-line no-undef
-      console.error("Error:", error);
-    }
-  } catch (error) {
-    // eslint-disable-next-line no-undef
-    console.log("Error obtaining token", error);
-  }
-
-  return null;
-};
