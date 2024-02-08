@@ -1,11 +1,14 @@
 "use client";
-import { cache, use, useEffect } from "react";
+import { useState } from "react";
+import Head from "next/head";
+import Script from "next/script";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Theme from "../common/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Loading from "../common/loading";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,13 +24,44 @@ const queryClient = new QueryClient({
 });
 
 export default function App({ Component, pageProps }) {
+  const [loadedOffice, setLoadedOffice] = useState(false);
   return (
-    <ThemeProvider theme={Theme}>
-      <QueryClientProvider client={queryClient}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Component {...pageProps} />
-        </LocalizationProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <>
+      {/* https://learn.microsoft.com/en-us/answers/questions/1070090/using-office-javascript-api-in-next-js */}
+      {process.env.NODE_ENV !== "production" && (
+        <Script
+          id="store_replaceState"
+          dangerouslySetInnerHTML={{
+            __html: "window._replaceState = window.replaceState",
+          }}
+        />
+      )}
+      <Script
+        async
+        type="text/javascript"
+        src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
+        crossOrigin="anonymous"
+        onLoad={() => setLoadedOffice(true)}
+      ></Script>
+      {process.env.NODE_ENV !== "production" && loadedOffice && (
+        <Script
+          id="assign_replaceState"
+          dangerouslySetInnerHTML={{
+            __html: "window.history.replaceState = window._replaceState",
+          }}
+        />
+      )}
+      <ThemeProvider theme={Theme}>
+        <QueryClientProvider client={queryClient}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            {loadedOffice ? (
+              <Component {...pageProps} />
+            ) : (
+              <Loading isLoading />
+            )}
+          </LocalizationProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </>
   );
 }
