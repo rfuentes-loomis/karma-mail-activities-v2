@@ -56,7 +56,8 @@ export default function App({ Component, pageProps }) {
       <ThemeProvider theme={Theme}>
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            {loadedOffice ? <Component {...pageProps} /> : <Loading center isLoading={true} />}
+            <Loading center isLoading={loadedOffice == false} />
+            {loadedOffice ? <Component {...pageProps} /> : null}
           </LocalizationProvider>
         </QueryClientProvider>
       </ThemeProvider>

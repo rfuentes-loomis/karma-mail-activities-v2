@@ -318,13 +318,13 @@ const App = () => {
 
     if (currentMsUserIsError) {
       setFatalError(true);
-      setFatalErrorMsg(currentMsUserError?.name || "Error authenticating with Office");
+      setFatalErrorMsg(currentMsUserError?.name || "Error authenticating with Office.");
       return;
     }
 
     if (activeEmployeeIsError || (activeEmployeeIsFetched && activeEmployee === null)) {
       setFatalError(true);
-      setFatalErrorMsg(`Error Employee record for ${currentMSUser?.mail}`);
+      setFatalErrorMsg(`No record found for employee with email ${currentMSUser?.mail}`);
       return;
     }
   }, [
