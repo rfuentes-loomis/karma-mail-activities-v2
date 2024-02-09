@@ -246,7 +246,7 @@ const App = () => {
       try {
         const toSave = {
           ...values,
-          userId: activeEmployee.userName,
+          userId: activeEmployee?.userName || currentMSUser?.lastName,
           workEffortDate: values.workEffortDate.format(),
           consultants:
             values.consultants?.map((x) => ({
@@ -321,12 +321,15 @@ const App = () => {
       setFatalErrorMsg(currentMsUserError?.name || "Error authenticating with Office.");
       return;
     }
-
-    if (activeEmployeeIsError || (activeEmployeeIsFetched && activeEmployee === null)) {
-      setFatalError(true);
-      setFatalErrorMsg(`No record found for employee with email ${currentMSUser?.mail}`);
-      return;
-    }
+    /**
+     *
+      Remove for now
+     */
+    // if (activeEmployeeIsError || (activeEmployeeIsFetched && activeEmployee === null)) {
+    //   setFatalError(true);
+    //   setFatalErrorMsg(`No record found for employee with email ${currentMSUser?.mail}`);
+    //   return;
+    // }
   }, [
     // current user
     loadingMsUser,
