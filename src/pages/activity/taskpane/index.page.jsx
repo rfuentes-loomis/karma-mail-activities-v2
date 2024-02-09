@@ -246,7 +246,7 @@ const App = () => {
       try {
         const toSave = {
           ...values,
-          userId: activeEmployee?.userName || currentMSUser?.lastName,
+          userId: activeEmployee?.userName || currentMSUser?.surname,
           workEffortDate: values.workEffortDate.format(),
           consultants:
             values.consultants?.map((x) => ({
