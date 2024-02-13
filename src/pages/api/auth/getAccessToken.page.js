@@ -1,4 +1,4 @@
-import { getAccessToken } from "../../../utils/auth";
+import { getAccessToken } from "../../../utils/ms-graph";
 export default async function handler(req, res) {
   const auth = req.headers.authorization;
   try {

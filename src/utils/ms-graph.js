@@ -34,11 +34,11 @@ async function validateJwt(authHeader) {
   }
 }
 
-async function getGraphData(accessToken, apiUrl, queryParams) {
+export async function getGraphData(accessToken, apiUrl, customHeaderProps) {
   return new Promise((resolve, reject) => {
     const options = {
       host: domain,
-      path: "/" + version + apiUrl + queryParams,
+      path: "/" + version + apiUrl,
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -47,6 +47,7 @@ async function getGraphData(accessToken, apiUrl, queryParams) {
         "Cache-Control": "private, no-cache, no-store, must-revalidate",
         Expires: "-1",
         Pragma: "no-cache",
+        ...customHeaderProps,
       },
     };
 
@@ -66,8 +67,12 @@ async function getGraphData(accessToken, apiUrl, queryParams) {
           // requested OData or error information.
 
           if (response.statusCode === 200) {
-            const parsedBody = JSON.parse(body);
-            resolve(parsedBody);
+            if (apiUrl.indexOf("$value") > 0) {
+              resolve(body);
+            } else {
+              const parsedBody = JSON.parse(body);
+              resolve(parsedBody);
+            }
           } else {
             // The error body sometimes includes an empty space
             // before the first character, remove it or it causes an error.
@@ -119,9 +124,9 @@ export const handleAuth = async () => {
   return null;
 };
 /**
- * Used by API 
- * @param {*} authorization 
- * @returns 
+ * Used by API
+ * @param {*} authorization
+ * @returns
  */
 export async function getAccessToken(authorization) {
   if (!authorization) {
@@ -165,12 +170,11 @@ export async function getAccessToken(authorization) {
     }
     const graphToken = json.access_token;
     const graphUrlSegment = process.env.GRAPH_URL_SEGMENT || "/me";
-    const graphQueryParamSegment = process.env.QUERY_PARAM_SEGMENT || "";
-    const graphData = await getGraphData(graphToken, graphUrlSegment, graphQueryParamSegment);
+    const graphData = await getGraphData(graphToken, graphUrlSegment);
     if (graphData?.code) {
       throw new Error("Error Code: " + graphData?.code + "; Microsoft Graph error " + JSON.stringify(graphData));
     } else {
-      return graphData;
+      return { ...graphData, auth: json };
     }
 
     return json;

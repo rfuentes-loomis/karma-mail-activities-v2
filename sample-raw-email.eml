@@ -1,0 +1,128 @@
+Received: from BN0PR04MB7950.namprd04.prod.outlook.com (2603:10b6:408:155::11)
+ by SA2PR04MB7691.namprd04.prod.outlook.com with HTTPS; Fri, 9 Feb 2024
+ 19:08:44 +0000
+Received: from SA2PR04MB7691.namprd04.prod.outlook.com (2603:10b6:806:140::24)
+ by BN0PR04MB7950.namprd04.prod.outlook.com (2603:10b6:408:155::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.27; Fri, 9 Feb
+ 2024 19:08:43 +0000
+Received: from SA2PR04MB7691.namprd04.prod.outlook.com
+ ([fe80::e02e:1212:747f:5793]) by SA2PR04MB7691.namprd04.prod.outlook.com
+ ([fe80::e02e:1212:747f:5793%3]) with mapi id 15.20.7270.024; Fri, 9 Feb 2024
+ 19:08:43 +0000
+From: Randy Fuentes <fuentesrandy@tzgvf.onmicrosoft.com>
+To: Randy Fuentes <fuentesrandy@tzgvf.onmicrosoft.com>
+Subject: Re: Test Email
+Thread-Topic: Test Email
+Thread-Index: AQHaJvxSDE0jvcmPY0Wxd0+YztOM6bECyKpdgAAAFvM=
+Date: Fri, 9 Feb 2024 19:08:43 +0000
+Message-ID:
+	<SA2PR04MB7691DBACB37AFD089C82507A8D4B2@SA2PR04MB7691.namprd04.prod.outlook.com>
+References:
+	<SA2PR04MB7691BDD5B5500267921390218D86A@SA2PR04MB7691.namprd04.prod.outlook.com>
+ <SA2PR04MB769152C7A16E971659325B838D4B2@SA2PR04MB7691.namprd04.prod.outlook.com>
+In-Reply-To:
+	<SA2PR04MB769152C7A16E971659325B838D4B2@SA2PR04MB7691.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: SA2PR04MB7691.namprd04.prod.outlook.com
+X-MS-Has-Attach:
+X-MS-Exchange-Organization-Network-Message-Id:
+	4ac5d7b3-197a-4b03-477a-08dc29a28874
+X-MS-Exchange-Organization-SCL: 1
+X-MS-TNEF-Correlator:
+X-MS-Exchange-Organization-RecordReviewCfmType: 0
+msip_labels:
+	MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_Enabled=True;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_SiteId=6703241b-3ef6-4e56-b8ca-a04eb0dd9ac7;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_SetDate=2024-02-09T19:08:42.679Z;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_Name=All
+ Employees
+ (unrestricted);MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_ContentBits=0;MSIP_Label_defa4170-0d19-0005-0004-bc88714345d2_Method=Standard;
+x-ms-publictraffictype: Email
+X-Microsoft-Antispam-Mailbox-Delivery:
+	ucf:0;jmr:0;auth:0;dest:I;ENG:(910001)(944506478)(944626604)(920097)(425001)(930097)(140003);
+X-Microsoft-Antispam-Message-Info:
+	WTaswojs4+wnDgNEBJr5w4NUszbpQDzhlrRVteVP0RGcu+lF/zqEnnIjd1KPNkqUZK9p5TF+Zpl/RT+IvVogDSf/VnApoXs8NHOqeIjgPHKr4LHmnpROl606hI0XHRXAVzl2GU2rVk6xKy2kM/JR1OPdP3dxitNPVIHnOUSz/hYIWulkGJYhN8xTOeDLW9qAWYnukOn7O/l3ygS/4jqmPSmjJaloiN2qm/hItQW3gMqJAoXsJsVUJjHj7mHhqG4CPJy+EepttJRWQWVTaKn3ZKCwlxXrn/YREHThYWpBLThW71H8Lm+UpXHNCH/oVoNzHS6htV9vW+zS1r93fCmXUSeFI13RfjMcykgpDsDA7/UbkreYUidgb3VC9uxDLo9PbACjCmQpvzo7cwL6OmxXhlQD2d1dsKChRXq1cuymQiXU3nFI7gfsEbcbUz3otJ6L7LZjT1bNOI0Ss1cng29Ox2mGbII12yBdwU1mKeqRkzjj5eEO0HpOv0J1/fJLHy1ZdZsc4mjrPYwgw5OLg2CYFJI1wiAVyxLhAZtVeo835so3NJjrGQ5vRaNwZ1GvhgqHBJron7RIhQu812286kURHyLoDYV9Ti5eSudnUZXf0ZMFISBPXMv1pb06egbPKfJdvCGIKc/ldStOJFwFHmqSlKuCH+5O8mN0GCzaMzs1oBSCNDBJI6BFMSEvYG1yi45vYt5yp/xzK64SxzwCk8UeGOjsScJy+VyYh71mYiXEYcM1TIDfsMrqFjE+oFVBqvO1
+Content-Type: multipart/alternative;
+	boundary="_000_SA2PR04MB7691DBACB37AFD089C82507A8D4B2SA2PR04MB7691namp_"
+MIME-Version: 1.0
+
+--_000_SA2PR04MB7691DBACB37AFD089C82507A8D4B2SA2PR04MB7691namp_
+Content-Type: text/plain; charset="us-ascii"
+
+thread 2
+________________________________
+From: Randy Fuentes <fuentesrandy@tzgvf.onmicrosoft.com>
+Sent: Friday, February 9, 2024 2:08 PM
+To: Randy Fuentes <fuentesrandy@tzgvf.onmicrosoft.com>
+Subject: Re: Test Email
+
+email thread 1
+________________________________
+From: Randy Fuentes <fuentesrandy@tzgvf.onmicrosoft.com>
+Sent: Monday, December 4, 2023 4:53 PM
+To: Randy Fuentes <fuentesrandy@tzgvf.onmicrosoft.com>
+Subject: Test Email
+
+What is Lorem Ipsum?
+
+Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+--_000_SA2PR04MB7691DBACB37AFD089C82507A8D4B2SA2PR04MB7691namp_
+Content-Type: text/html; charset="us-ascii"
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css" style="display:none;"> P {margin-top:0;margin-bottom:0;} </style>
+</head>
+<body dir="ltr">
+<div style="font-family: Aptos, Aptos_EmbeddedFont, Aptos_MSFontService, Calibri, Helvetica, sans-serif; font-size: 12pt; color: rgb(0, 0, 0);" class="elementToProof">
+thread 2</div>
+<div id="appendonsend"></div>
+<hr style="display:inline-block;width:98%" tabindex="-1">
+<div id="divRplyFwdMsg" dir="ltr"><font face="Calibri, sans-serif" style="font-size:11pt" color="#000000"><b>From:</b> Randy Fuentes &lt;fuentesrandy@tzgvf.onmicrosoft.com&gt;<br>
+<b>Sent:</b> Friday, February 9, 2024 2:08 PM<br>
+<b>To:</b> Randy Fuentes &lt;fuentesrandy@tzgvf.onmicrosoft.com&gt;<br>
+<b>Subject:</b> Re: Test Email</font>
+<div>&nbsp;</div>
+</div>
+<style type="text/css" style="display:none">
+<!--
+p
+	{margin-top:0;
+	margin-bottom:0}
+-->
+</style>
+<div dir="ltr">
+<div class="x_elementToProof" style="font-family:Aptos,Aptos_EmbeddedFont,Aptos_MSFontService,Calibri,Helvetica,sans-serif; font-size:12pt; color:rgb(0,0,0)">
+email thread 1</div>
+<div id="x_appendonsend"></div>
+<hr tabindex="-1" style="display:inline-block; width:98%">
+<div id="x_divRplyFwdMsg" dir="ltr"><font face="Calibri, sans-serif" color="#000000" style="font-size:11pt"><b>From:</b> Randy Fuentes &lt;fuentesrandy@tzgvf.onmicrosoft.com&gt;<br>
+<b>Sent:</b> Monday, December 4, 2023 4:53 PM<br>
+<b>To:</b> Randy Fuentes &lt;fuentesrandy@tzgvf.onmicrosoft.com&gt;<br>
+<b>Subject:</b> Test Email</font>
+<div>&nbsp;</div>
+</div>
+<style type="text/css" style="display:none">
+<!--
+p
+	{margin-top:0;
+	margin-bottom:0}
+-->
+</style>
+<div dir="ltr">
+<h2 class="x_x_elementToProof" style="letter-spacing:normal; font-family:DauphinPlain; font-size:24px; font-weight:400">
+<span style="color:rgb(0,0,0)">What is Lorem Ipsum?</span></h2>
+<p class="x_x_elementToProof" style="text-align:justify; margin:0px 0px 15px; background-color:rgb(255,255,255)">
+<span style="letter-spacing:normal; font-family:&quot;Open Sans&quot;,Arial,sans-serif; font-size:14px; color:rgb(0,0,0)"><b>Lorem Ipsum</b></span><span style="letter-spacing:normal; font-family:&quot;Open Sans&quot;,Arial,sans-serif; font-size:14px; font-weight:400; color:rgb(0,0,0)">&nbsp;is
+ simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only
+ five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus
+ PageMaker including versions of Lorem Ipsum.</span></p>
+</div>
+</div>
+</body>
+</html>
+
+--_000_SA2PR04MB7691DBACB37AFD089C82507A8D4B2SA2PR04MB7691namp_--

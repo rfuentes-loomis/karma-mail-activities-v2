@@ -1,4 +1,5 @@
 "use client";
+//#region imports
 import { useCallback, useState, useEffect } from "react";
 import { request, applyMutation } from "../../../utils/graph-ql";
 import { useMutation, useQuery } from "react-query";
@@ -18,7 +19,21 @@ import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Loading from "../../../common/loading";
 import { toTrimAndLowerCase, extractNameFromEmail } from "../../../utils/stringHelpers";
-import { handleAuth } from "../../../utils/auth";
+import { handleAuth } from "../../../utils/ms-graph";
+import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import IconButton from "@mui/material/IconButton";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import Divider from "@mui/material/Divider";
+import NotesIcon from "@mui/icons-material/Notes";
+import AttachEmailIcon from "@mui/icons-material/AttachEmail";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import Link from "@mui/material/Link";
+import { getGraphData } from "../../../utils/ms-graph";
+import Chip from "@mui/material/Chip";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
+//#endregion
 
 //#region Graph QL query definition
 const accountsSimpleGraph = `accounts{
@@ -133,7 +148,18 @@ const fetchWorkEffortCategoryByEffortType = (workEffortTypeId) =>
     }
   }`).then(({ workEffortCategories }) => workEffortCategories);
 
-const insertActivityApi = (payload) => applyMutation("addActivity", { input: payload }, ["workEffortId"]);
+const insertActivityMutation = (payload) => applyMutation("addActivity", { input: payload }, ["workEffortId"]);
+
+const postAttachments = ({ attachment, userId, workEffortId }) =>
+  applyMutation("upsertActivityAttachment", {
+    input: {
+      attachmentSeqNumber: 1,
+      contentBase64Encoded: attachment.contentBase64Encoded,
+      fileName: attachment.fileName,
+      userId: userId,
+      workEffortId: workEffortId,
+    },
+  });
 
 const fetchActiveEmployeeByEmail = (email) =>
   request(`{
@@ -143,6 +169,11 @@ const fetchActiveEmployeeByEmail = (email) =>
       userName
     }
   }`).then(({ activeEmployeeByEmail }) => activeEmployeeByEmail);
+
+const getUniqueEmailBodyAsText = (msUser, messageId) =>
+  getGraphData(msUser.auth.access_token, `/users/${msUser.id}/messages/${messageId}?$select=uniqueBody`, { Prefer: 'outlook.body-content-type="text"' });
+
+const getEmailAsEml = (msUser, messageId) => getGraphData(msUser.auth.access_token, `/users/${msUser.id}/messages/${messageId}/$value`);
 
 //#endregion
 
@@ -187,11 +218,20 @@ const useSearchEmployees = (value) =>
       value
     )
   );
-const useInsertActivity = () => useMutation({ mutationFn: (args) => insertActivityApi(args) });
+const useInsertActivity = () => useMutation({ mutationFn: (args) => insertActivityMutation(args) });
 
-const useAuthUser = (enabled) => useQuery("user-auth", () => handleAuth(), { enabled: enabled });
+const useAuthUser = (enabled) => useQuery("user-auth", () => handleAuth(), { enabled, staleTime: 150 * 1000, refetchInterval: 150 * 1000 });
 
 const useFetchActiveEmployeeByEmail = (email) => useQuery(`active-employee-${email}`, () => fetchActiveEmployeeByEmail(email), { enabled: email != null });
+
+const useGetEmailUniqueBodyAsText = (currentMSUser, messageId) =>
+  useQuery(`email-unique-body-${messageId}`, () => getUniqueEmailBodyAsText(currentMSUser, messageId), { enabled: false });
+
+const useGetRawEmailContents = (currentMSUser, messageId) =>
+  useQuery(`raw-email-${messageId}`, () => getEmailAsEml(currentMSUser, messageId), { enabled: false });
+
+const usePostAttachments = () => useMutation({ mutationFn: (args) => postAttachments(args) });
+
 //#endregion
 
 //#region form schema
@@ -224,12 +264,14 @@ const ActivitySchema = Yup.object().shape({
 //#endregion
 
 const App = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
   //#region Form config
   const formik = useFormik({
     initialValues: {
       userId: undefined,
       workEffortTypeId: undefined,
-      workEffortCategoryId: undefined,
+      workEffortCategoryId: "",
       workEffortDate: dayjs(new Date()),
       primaryItemId: undefined,
       subject: undefined,
@@ -270,6 +312,15 @@ const App = () => {
           addActivity: { workEffortId },
         } = results;
 
+        if (emailAsAttachment) {
+          const attachmentPayload = { attachment: emailAsAttachment, userId: toSave.userId, workEffortId };
+          try {
+            const attachmentResults = await postAttachmentsAsync(attachmentPayload);
+          } catch (error) {
+            setFormErrorMsg("Activity Saved :),  However experienced error saving attachment.");
+          }
+        }
+
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (ex) {
         setFormErrorMsg("Error saving activity.");
@@ -285,6 +336,9 @@ const App = () => {
   const [fatalErrorMsg, setFatalErrorMsg] = useState(null);
   const [officeIsReady, setOfficeIsReady] = useState(false);
   const [formErrorMsg, setFormErrorMsg] = useState(null);
+  const [emailItem, setEmailItem] = useState(null);
+  const [emailAsAttachment, setEmailAsAttachment] = useState(null);
+
   const [entitySearchStr, setEntitySearchStr] = useState("a");
   const [productsSearchStr, setProductsSearchStr] = useState("a");
   const [consultantsSearchStr, setConsultantsSearchStr] = useState("a");
@@ -296,7 +350,11 @@ const App = () => {
   //#region Queries & Mutations
   const { mutateAsync: insertActivityAsync, isSuccess: insertActivitySuccess } = useInsertActivity();
   const { data: workEffortTypes, isLoading: workEffortTypesLoading } = useWorkEffortTypes();
-  const { data: workEffortCategories, isLoading: workEffortCategoriesLoading } = useWorkEffortCategoryByEffortType(formik.values.workEffortTypeId);
+  const {
+    data: workEffortCategories,
+    isLoading: workEffortCategoriesLoading,
+    isFetched: workEffortCategoriesIsFetched,
+  } = useWorkEffortCategoryByEffortType(formik.values.workEffortTypeId);
   const { data: dynamicSearchResults, isLoading: dynamicSearchResultsIsLoading } = useSearchDynamicEntity(entityMapContext, entitySearchStr);
   const { data: productsSearchResults, isLoading: productsSearchResultsIsLoading } = useSearchProducts(productsSearchStr);
   const { data: consultantsSearchResults, isLoading: consultantsSearchResultsIsLoading } = useSearchConsultants(consultantsSearchStr);
@@ -310,6 +368,18 @@ const App = () => {
     isFetched: activeEmployeeIsFetched,
     isLoading: activeEmployeeIsLoading,
   } = useFetchActiveEmployeeByEmail(currentMSUser?.mail);
+  const { isFetching: fetchingEmailUniqueBody, refetch: fetchEmailUniqueBody } = useGetEmailUniqueBodyAsText(currentMSUser, emailItem?.itemId);
+  const { isFetching: fetchingEmailRawContents, refetch: fetchEmailRawContents } = useGetRawEmailContents(currentMSUser, emailItem?.itemId);
+  const { mutateAsync: postAttachmentsAsync, isSuccess: postAttachmentsSuccess } = usePostAttachments();
+  //#endregion
+
+  //#region Set default work Effort Category to Email
+  useEffect(() => {
+    if (workEffortCategoriesLoading || !workEffortCategoriesIsFetched) return;
+    const emailType = workEffortCategories?.find((x) => toTrimAndLowerCase(x.workEffortCategoryDesc) === toTrimAndLowerCase("E-Mail"));
+    formik.setFieldValue("workEffortCategoryId", emailType?.workEffortCategoryId);
+  }, [workEffortCategories, workEffortCategoriesLoading, workEffortCategoriesIsFetched]);
+
   //#endregion
 
   //#region Handle Fatal Error
@@ -344,10 +414,18 @@ const App = () => {
   ]);
   //#endregion
 
-  //#region Handle Office On Ready
+  //#region Handle Office On Ready & set Default values
   const officeOnReadyCallback = useCallback(() => {
     if (officeIsReady) return;
+    if (!Office.context.mailbox) return;
+    // Office.context.mailbox.item.to; //array [{emailAddress,displayName}]
+    // Office.context.mailbox.item.bcc; //array [{emailAddress,displayName}]
+    // Office.context.mailbox.item.cc; //array [{emailAddress,displayName}]
+    // Office.context.mailbox.item.from; // object {emailAddress,displayName }
     setOfficeIsReady(true);
+    setEmailItem(Office.context.mailbox.item);
+    formik.setFieldValue("subject", Office.context.mailbox.item.normalizedSubject);
+    formik.setFieldValue("workEffortDate", dayjs(new Date(Office.context.mailbox.item.dateTimeCreated)));
   }, [officeIsReady]);
   useEffect(() => {
     Office.onReady(officeOnReadyCallback);
@@ -359,8 +437,25 @@ const App = () => {
 
   //#region Helper Methods
   const isWorkEffortAvailable = (value) => toTrimAndLowerCase(value) === "plansponsor";
-  const showLoading = () => workEffortTypesLoading || formik.isSubmitting || officeIsReady == false || loadingMsUser;
+  const showLoading = () => workEffortTypesLoading || formik.isSubmitting || officeIsReady == false || loadingMsUser || fetchingEmailRawContents;
   const canSubmit = () => formik.isSubmitting === false && showLoading() === false;
+  const handleOptionsMenuClick = (event) => setAnchorEl(event.currentTarget);
+  const handleOptionsMenuClose = () => setAnchorEl(null);
+
+  const copyEmailUniqueBodyToPublicComments = async () => {
+    const { data } = await fetchEmailUniqueBody();
+    formik.setFieldValue("commentsClob", data?.uniqueBody?.content);
+  };
+
+  const addEmailAsAttachment = async () => {
+    const { data } = await fetchEmailRawContents();
+    const contentBase64Encoded = btoa(data);
+    const attachment = {
+      contentBase64Encoded,
+      fileName: `Email.eml`,
+    };
+    setEmailAsAttachment(attachment);
+  };
   //#endregion
 
   if (fatalError) {
@@ -401,25 +496,119 @@ const App = () => {
       <form onSubmit={formik.handleSubmit}>
         <Box
           sx={{
-            margin: "5px",
             display: "flex",
             flexDirection: "column",
             height: "100vh",
-            padding: "15px",
-            "& .MuiFormControl-root": { margin: "5px 0px 5px 0px" },
+            padding: "10px",
+            "& .MuiFormControl-root": { margin: "7px 0px 7px 0px" },
           }}
         >
-          <h3 style={{ textAlign: "center" }}>
-            Create {workEffortTypes?.find((x) => x.workEffortTypeId === formik.values.workEffortTypeId)?.subjectArea}
-            Activity
-          </h3>
-          <Loading center isLoading={showLoading()} />
-          {formErrorMsg ? (
-            <Alert severity="error">
-              <AlertTitle>Error</AlertTitle>
-              {formErrorMsg}
-            </Alert>
-          ) : null}
+          {/* Header */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            {/* Back button */}
+            {formik.values.workEffortTypeId !== undefined ? (
+              <IconButton
+                size="small"
+                sx={{ ml: 2 }}
+                onClick={() => {
+                  formik.setFieldValue("workEffortTypeId", undefined);
+                  setEntitySearchStr("a");
+                }}
+              >
+                <ArrowBackIosIcon />
+              </IconButton>
+            ) : null}
+
+            {/* Title */}
+            <h4 style={{ textAlign: "center", width: "100%" }}>
+              {workEffortTypes?.find((x) => x.workEffortTypeId === formik.values.workEffortTypeId)?.subjectArea}
+              Activity
+            </h4>
+
+            {/* Options Menu */}
+            {formik.values.workEffortTypeId !== undefined ? (
+              <>
+                {" "}
+                <Box sx={{ display: "flex", alignItems: "center", textAlign: "center" }}>
+                  <Tooltip title="Email Options">
+                    <IconButton
+                      onClick={handleOptionsMenuClick}
+                      size="small"
+                      sx={{ ml: 2 }}
+                      aria-controls={open ? "more-menu" : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? "true" : undefined}
+                    >
+                      <MoreVertIcon sx={{ width: 32, height: 32 }}></MoreVertIcon>
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <Menu
+                  anchorEl={anchorEl}
+                  id="more-menu"
+                  open={open}
+                  onClose={handleOptionsMenuClose}
+                  onClick={handleOptionsMenuClose}
+                  PaperProps={{
+                    elevation: 0,
+                    sx: {
+                      overflow: "visible",
+                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                      mt: 1.5,
+                      "& .MuiSvgIcon-root": {
+                        width: 32,
+                        height: 32,
+                        ml: -0.5,
+                        mr: 2,
+                      },
+                      "&::before": {
+                        content: '""',
+                        display: "block",
+                        position: "absolute",
+                        top: 0,
+                        right: 14,
+                        width: 10,
+                        height: 10,
+                        bgcolor: "background.paper",
+                        transform: "translateY(-50%) rotate(45deg)",
+                        zIndex: 0,
+                      },
+                    },
+                  }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                >
+                  <MenuItem onClick={() => copyEmailUniqueBodyToPublicComments() && handleOptionsMenuClose()}>
+                    <NotesIcon />
+                    Copy email to comments
+                    <Loading isLoading={fetchingEmailUniqueBody} />
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={() => addEmailAsAttachment() && handleOptionsMenuClose()}>
+                    <AttachEmailIcon />
+                    Add email thread as attachment
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : null}
+          </Box>
+          {/* Sub header */}
+          <Box>
+            <Loading center isLoading={showLoading()} />
+            {formErrorMsg ? (
+              <Alert severity="error">
+                <AlertTitle>Error</AlertTitle>
+                {formErrorMsg}
+              </Alert>
+            ) : null}
+          </Box>
+          {/* Main Form Body */}
           {formik.values.workEffortTypeId === undefined ? (
             <>
               {/* 1st Step: workEffortType */}
@@ -438,7 +627,7 @@ const App = () => {
                     key={k}
                     sx={{ margin: "5px 0px 5px 0px" }}
                     variant="outlined"
-                    disabled={isWorkEffortAvailable(v.subjectArea) === false}
+                    disabled={isWorkEffortAvailable(v.subjectArea) === false || showLoading()}
                     onClick={() => {
                       formik.setFieldValue("workEffortTypeId", v.workEffortTypeId);
                       const entityMap = searchEntityQueryMap.find(
@@ -477,17 +666,6 @@ const App = () => {
             </>
           ) : (
             <>
-              {/*  */}
-              <Button
-                variant="outlined"
-                sx={{ margin: "10px 0px 10px 0px" }}
-                onClick={() => {
-                  formik.setFieldValue("workEffortTypeId", undefined);
-                  setEntitySearchStr("a");
-                }}
-              >
-                {`<-- Back`}
-              </Button>
               {/* Choose Entity: primaryItemId */}
               <Autocomplete
                 disablePortal
@@ -568,17 +746,38 @@ const App = () => {
                 referenceDate={dayjs(new Date())}
               />
               {/* Public Comments */}
-              <TextField
-                id="commentsClob"
-                label="Public Comments"
-                multiline
-                rows={4}
-                helperText={formik.touched.commentsClob && formik.errors.commentsClob}
-                value={formik.values.commentsClob}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                error={formik.touched.commentsClob && Boolean(formik.errors.commentsClob)}
-              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <TextField
+                  id="commentsClob"
+                  label="Public Comments"
+                  multiline
+                  rows={4}
+                  helperText={formik.touched.commentsClob && formik.errors.commentsClob}
+                  value={formik.values.commentsClob ?? ""}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  error={formik.touched.commentsClob && Boolean(formik.errors.commentsClob)}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Box>
+                    <Loading isLoading={fetchingEmailUniqueBody} />
+                  </Box>
+                  <Link sx={{ float: "right", cursor: "pointer" }} onClick={copyEmailUniqueBodyToPublicComments}>
+                    Copy email body
+                  </Link>
+                </Box>
+              </Box>
               {/* Private Comments */}
               <TextField
                 id="privateComments"
@@ -695,12 +894,76 @@ const App = () => {
                   />
                 )}
               />
-              {/* Save Action */}
-              <Button fullWidth variant="contained" type="submit" disabled={canSubmit() === false}>
-                {formik.isSubmitting ? <Loading isLoading /> : `Save`}
-              </Button>
             </>
           )}
+          {/* Footer */}
+          <Box>
+            {formik.values.workEffortTypeId !== undefined ? (
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  {emailAsAttachment ? (
+                    <>
+                      <Chip
+                        sx={{
+                          margin: "5px 0px 10px 0px",
+                          "& .MuiChip-deleteIcon": {
+                            color: "#bdbdbd",
+                          },
+                        }}
+                        color="success"
+                        variant="outlined"
+                        avatar={<AttachEmailIcon />}
+                        label={"Email added as attachment"}
+                        onDelete={() => setEmailAsAttachment(null)}
+                        deleteIcon={
+                          <Tooltip title="Remove">
+                            <DeleteIcon />
+                          </Tooltip>
+                        }
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Chip
+                        sx={{
+                          margin: "5px 0px 10px 0px",
+                          "& .MuiChip-deleteIcon": {
+                            color: "#bdbdbd",
+                          },
+                        }}
+                        variant="outlined"
+                        avatar={<AttachEmailIcon />}
+                        label={"Add email as attachment"}
+                        onDelete={() => addEmailAsAttachment()}
+                        deleteIcon={
+                          <Tooltip title="Add email as attachment">
+                            <AddIcon />
+                          </Tooltip>
+                        }
+                      />
+                    </>
+                  )}
+                  <Box
+                    sx={{
+                      margin: "10px 0px 0px 10px",
+                    }}
+                  >
+                    <Loading isLoading={fetchingEmailRawContents} />
+                  </Box>
+                </Box>
+                {/* Save Action */}
+
+                <Button fullWidth variant="contained" type="submit" disabled={canSubmit() === false}>
+                  {formik.isSubmitting ? <Loading isLoading /> : `Save`}
+                </Button>
+              </>
+            ) : null}
+          </Box>
         </Box>
       </form>
     </>
