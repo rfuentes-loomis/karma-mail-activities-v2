@@ -3,7 +3,7 @@ import { EnumType, jsonToGraphQLQuery } from "json-to-graphql-query";
 
 export const request = (query) => {
   return new Promise((resolve, reject) => {
-    api.post("", { query }).then((res) => {
+    api.post("graphiql/query/", { query }).then((res) => {
       if (res.data.errors) {
         // console.error("QUERY error:", res.data.errors);
         // throw "Query syntax error";
@@ -43,12 +43,7 @@ const cleanPayload = (payload) => {
   const ret = Object.entries(payload).reduce(
     (acc, [key, value]) => ({
       ...acc,
-      [key]:
-        value === undefined || value === ""
-          ? null
-          : isObject(value) && !(value instanceof EnumType)
-          ? cleanPayload(value)
-          : value,
+      [key]: value === undefined || value === "" ? null : isObject(value) && !(value instanceof EnumType) ? cleanPayload(value) : value,
     }),
     {}
   );

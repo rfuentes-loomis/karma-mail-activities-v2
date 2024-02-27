@@ -9,15 +9,16 @@
     "start": "next start",
     "start:prod": "node server.js",
     "start:local": "node ./server.js",
-    "lint": "next lint"
+    "lint": "next lint",
+    "validate": "office-addin-manifest validate manifest-local.xml"
   },
   "dependencies": {
     "@azure/msal-browser": "^3.5.0",
     "@azure/msal-react": "^2.0.7",
-    "@emotion/react": "^11.11.3",
+    "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.10",
-    "@mui/material": "^5.15.10",
+    "@mui/icons-material": "^5.15.11",
+    "@mui/material": "^5.15.11",
     "@mui/x-date-pickers": "^6.19.2",
     "@tanstack/react-query-devtools": "^5.18.1",
     "axios": "^1.6.2",
@@ -38,6 +39,8 @@
   },
   "devDependencies": {
     "eslint": "^8",
-    "eslint-config-next": "14.0.3"
+    "eslint-config-next": "14.0.3",
+    "office-addin-cli": "^1.5.5",
+    "office-addin-manifest": "^1.12.3"
   }
 }

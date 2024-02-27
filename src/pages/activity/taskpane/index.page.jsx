@@ -1,4 +1,5 @@
 "use client";
+
 //#region imports
 import { useCallback, useState, useEffect } from "react";
 import { request, applyMutation } from "../../../utils/graph-ql";
@@ -30,9 +31,13 @@ import AttachEmailIcon from "@mui/icons-material/AttachEmail";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import Link from "@mui/material/Link";
 import { getGraphData } from "../../../utils/ms-graph";
+import { api } from "../../../utils/axiosConfig";
 import Chip from "@mui/material/Chip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import Modal from "@mui/material/Modal";
+
 //#endregion
 
 //#region Graph QL query definition
@@ -150,16 +155,15 @@ const fetchWorkEffortCategoryByEffortType = (workEffortTypeId) =>
 
 const insertActivityMutation = (payload) => applyMutation("addActivity", { input: payload }, ["workEffortId"]);
 
-const postAttachments = ({ attachment, userId, workEffortId }) =>
-  applyMutation("upsertActivityAttachment", {
-    input: {
-      attachmentSeqNumber: 1,
-      contentBase64Encoded: attachment.contentBase64Encoded,
-      fileName: attachment.fileName,
-      userId: userId,
-      workEffortId: workEffortId,
-    },
-  });
+const postAttachments = (data) => {
+  const attachmentPayload = new FormData();
+  attachmentPayload.append("attachment", data.attachment);
+  return api
+    .post(`upsert_work_effort_attachment/user_id/${data.userId}/work_effort_id/${data.workEffortId}`, attachmentPayload, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    .then(({ status }) => ({ status }));
+};
 
 const fetchActiveEmployeeByEmail = (email) =>
   request(`{
@@ -264,8 +268,9 @@ const ActivitySchema = Yup.object().shape({
 //#endregion
 
 const App = () => {
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const isOptionsMenuOpen = Boolean(anchorEl);
   //#region Form config
   const formik = useFormik({
     initialValues: {
@@ -313,9 +318,13 @@ const App = () => {
         } = results;
 
         if (emailAsAttachment) {
-          const attachmentPayload = { attachment: emailAsAttachment, userId: toSave.userId, workEffortId };
           try {
-            const attachmentResults = await postAttachmentsAsync(attachmentPayload);
+            const attachmentResults = await postAttachmentsAsync({
+              workEffortId: workEffortId,
+              seq: 1,
+              userId: toSave.userId,
+              attachment: emailAsAttachment,
+            });
           } catch (error) {
             setFormErrorMsg("Activity Saved :),  However experienced error saving attachment.");
           }
@@ -382,7 +391,7 @@ const App = () => {
 
   //#endregion
 
-  //#region Handle Fatal Error
+  //#region Fetch Current User handle defaults
   useEffect(() => {
     if (activeEmployeeIsLoading || loadingMsUser) return;
 
@@ -391,6 +400,7 @@ const App = () => {
       setFatalErrorMsg(currentMsUserError?.name || "Error authenticating with Office.");
       return;
     }
+
     /**
      *
       Remove for now
@@ -400,6 +410,11 @@ const App = () => {
     //   setFatalErrorMsg(`No record found for employee with email ${currentMSUser?.mail}`);
     //   return;
     // }
+
+    if (currentMSUser) {
+      addEmailAsAttachment(); // auto attach email as attachment
+      copyEmailUniqueBodyToPublicComments(); // auto populate public comments with email body
+    }
   }, [
     // current user
     loadingMsUser,
@@ -424,15 +439,14 @@ const App = () => {
     // Office.context.mailbox.item.from; // object {emailAddress,displayName }
     setOfficeIsReady(true);
     setEmailItem(Office.context.mailbox.item);
+
     formik.setFieldValue("subject", Office.context.mailbox.item.normalizedSubject);
     formik.setFieldValue("workEffortDate", dayjs(new Date(Office.context.mailbox.item.dateTimeCreated)));
   }, [officeIsReady]);
   useEffect(() => {
     Office.onReady(officeOnReadyCallback);
   }, [officeOnReadyCallback]);
-  useEffect(() => {
-    if (!officeIsReady) return;
-  }, [officeIsReady]);
+
   //#endregion
 
   //#region Helper Methods
@@ -441,7 +455,7 @@ const App = () => {
   const canSubmit = () => formik.isSubmitting === false && showLoading() === false;
   const handleOptionsMenuClick = (event) => setAnchorEl(event.currentTarget);
   const handleOptionsMenuClose = () => setAnchorEl(null);
-
+  const toggleFullScreen = () => setIsFullScreen((prev) => !prev);
   const copyEmailUniqueBodyToPublicComments = async () => {
     const { data } = await fetchEmailUniqueBody();
     formik.setFieldValue("commentsClob", data?.uniqueBody?.content);
@@ -449,12 +463,9 @@ const App = () => {
 
   const addEmailAsAttachment = async () => {
     const { data } = await fetchEmailRawContents();
-    const contentBase64Encoded = btoa(data);
-    const attachment = {
-      contentBase64Encoded,
-      fileName: `Email.eml`,
-    };
-    setEmailAsAttachment(attachment);
+    const blob = new Blob([data], { type: "message/rfc822" });
+    const emlFile = new File([blob], "Email.eml", { type: "message/rfc822" });
+    setEmailAsAttachment(emlFile);
   };
   //#endregion
 
@@ -541,9 +552,9 @@ const App = () => {
                       onClick={handleOptionsMenuClick}
                       size="small"
                       sx={{ ml: 2 }}
-                      aria-controls={open ? "more-menu" : undefined}
+                      aria-controls={isOptionsMenuOpen ? "more-menu" : undefined}
                       aria-haspopup="true"
-                      aria-expanded={open ? "true" : undefined}
+                      aria-expanded={isOptionsMenuOpen ? "true" : undefined}
                     >
                       <MoreVertIcon sx={{ width: 32, height: 32 }}></MoreVertIcon>
                     </IconButton>
@@ -552,7 +563,7 @@ const App = () => {
                 <Menu
                   anchorEl={anchorEl}
                   id="more-menu"
-                  open={open}
+                  open={isOptionsMenuOpen}
                   onClose={handleOptionsMenuClose}
                   onClick={handleOptionsMenuClose}
                   PaperProps={{
@@ -752,11 +763,56 @@ const App = () => {
                   flexDirection: "column",
                 }}
               >
+                {/* full modal for editing */}
+                <Modal open={isFullScreen} onClose={toggleFullScreen} aria-labelledby="modal-title" aria-describedby="modal-description">
+                  <Box
+                    sx={{
+                      position: "relative",
+                      display: "flex",
+                      flexDirection: "column",
+                      height: "100%",
+                      bgcolor: "background.paper",
+                      boxShadow: 24,
+                      p: 4,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "7px",
+                      }}
+                    >
+                      <Tooltip title="Exit">
+                        <IconButton size="small" onClick={toggleFullScreen}>
+                          <FullscreenExitIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Link sx={{ cursor: "pointer", marginTop: "10px" }} onClick={() => formik.setFieldValue("commentsClob", "")}>
+                        Clear
+                      </Link>
+                    </Box>
+
+                    <TextField
+                      id="commentsClob"
+                      label="Public Comments"
+                      multiline
+                      focused={isFullScreen}
+                      sx={{ height: "100vh", flexGrow: "1", "& textarea": { resize: "vertical", minHeight: "80vh !important" } }}
+                      helperText={formik.touched.commentsClob && formik.errors.commentsClob}
+                      value={formik.values.commentsClob ?? ""}
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      error={formik.touched.commentsClob && Boolean(formik.errors.commentsClob)}
+                    />
+                  </Box>
+                </Modal>
                 <TextField
                   id="commentsClob"
                   label="Public Comments"
                   multiline
-                  rows={4}
+                  rows={5}
+                  sx={{ marginBottom: "0px !important" }}
                   helperText={formik.touched.commentsClob && formik.errors.commentsClob}
                   value={formik.values.commentsClob ?? ""}
                   onBlur={formik.handleBlur}
@@ -770,12 +826,17 @@ const App = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Box>
-                    <Loading isLoading={fetchingEmailUniqueBody} />
-                  </Box>
-                  <Link sx={{ float: "right", cursor: "pointer" }} onClick={copyEmailUniqueBodyToPublicComments}>
-                    Copy email body
-                  </Link>
+                  <Loading isLoading={fetchingEmailUniqueBody} />
+                  <Tooltip title="Expand Public Comments">
+                    <IconButton size="small" onClick={toggleFullScreen}>
+                      <FullscreenExitIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Clear Public Comments">
+                    <Link sx={{ cursor: "pointer", marginTop: "7px" }} onClick={() => formik.setFieldValue("commentsClob", "")}>
+                      Clear
+                    </Link>
+                  </Tooltip>
                 </Box>
               </Box>
               {/* Private Comments */}

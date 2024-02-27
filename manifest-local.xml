@@ -31,9 +31,15 @@
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
+    <Form xsi:type="ItemEdit">
+      <DesktopSettings>
+        <SourceLocation DefaultValue="https://localhost:3001/outlook/index.html" />
+      </DesktopSettings>
+    </Form>
   </FormSettings>
   <Permissions>ReadWriteItem</Permissions>
   <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Edit" />
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
   </Rule>
   <DisableEntityHighlighting>false</DisableEntityHighlighting>
@@ -49,8 +55,14 @@
       <Hosts>
         <Host xsi:type="MailHost">
           <DesktopFormFactor>
-            <FunctionFile resid="Commands.Url" />
-            <!-- <ExtensionPoint xsi:type="MessageComposeCommandSurface">
+            <!-- Process Item event, File and function declaration below -->
+            <FunctionFile resid="OutlookCmds.Url" />
+            <ExtensionPoint xsi:type="Events">
+              <Event Type="ItemSend" FunctionExecution="synchronous"
+                FunctionName="validateOnSend" />
+            </ExtensionPoint>
+            <!-- Message Compose -->
+            <ExtensionPoint xsi:type="MessageComposeCommandSurface">
               <OfficeTab id="TabDefault">
                 <Group id="msgComposeGroup">
                   <Label resid="GroupLabel" />
@@ -71,14 +83,14 @@
                   </Control>
                 </Group>
               </OfficeTab>
-            </ExtensionPoint> -->
+            </ExtensionPoint>
 
             <!-- Message Read -->
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="TabDefault">
-                <Group id="msgComposeGroup">
+                <Group id="msgReadGroup">
                   <Label resid="GroupLabel" />
-                  <Control xsi:type="Button" id="msgComposeOpenPaneButton">
+                  <Control xsi:type="Button" id="msgReadOpenPaneButton">
                     <Label resid="TaskpaneButton.Label" />
                     <Supertip>
                       <Title resid="TaskpaneButton.Label" />
@@ -107,7 +119,7 @@
           <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3001/assets/icon-80.png" />
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="Commands.Url" DefaultValue="https://localhost:3001/commands.html" />
+          <bt:Url id="OutlookCmds.Url" DefaultValue="https://localhost:3001/outlook/index.html" />
           <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3001/activity/taskpane" />
         </bt:Urls>
         <bt:ShortStrings>
@@ -125,6 +137,7 @@
         <Scopes>
           <Scope>User.Read</Scope>
           <Scope>profile</Scope>
+          <Scope>openid</Scope>
         </Scopes>
       </WebApplicationInfo>
     </VersionOverrides>
