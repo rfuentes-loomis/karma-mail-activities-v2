@@ -344,9 +344,9 @@ const App = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (ex) {
         setFormErrorMsg("Error saving activity.");
+      } finally {
+        setSubmitting(false);
       }
-
-      setSubmitting(false);
     },
   });
   //#endregion
@@ -628,7 +628,7 @@ const App = () => {
             ) : null}
           </Box>
           {/* Sub header */}
-          <Box>
+          <Box sx={{ marginBottom: "7px" }}>
             <Loading center isLoading={showLoading()} />
             {formErrorMsg ? (
               <Alert severity="error">
@@ -1029,6 +1029,16 @@ const App = () => {
                     <Loading isLoading={fetchingEmailRawContents} />
                   </Box>
                 </Box>
+
+                {formErrorMsg ? (
+                  <Box sx={{ marginBottom: "7px" }}>
+                    <Alert severity="error">
+                      <AlertTitle>Error</AlertTitle>
+                      {formErrorMsg}
+                    </Alert>
+                  </Box>
+                ) : null}
+
                 {/* Save Action */}
 
                 <Button fullWidth variant="contained" type="submit" disabled={canSubmit() === false}>

@@ -3,19 +3,24 @@ import { EnumType, jsonToGraphQLQuery } from "json-to-graphql-query";
 
 export const request = (query) => {
   return new Promise((resolve, reject) => {
-    api.post("graphiql/query/", { query }).then((res) => {
-      if (res.data.errors) {
-        // console.error("QUERY error:", res.data.errors);
-        // throw "Query syntax error";
+    api
+      .post("graphiql/query/", { query })
+      .then((res) => {
+        if (res.data.errors) {
+          // console.error("QUERY error:", res.data.errors);
+          // throw "Query syntax error";
+          reject(res.data);
+        }
+        if (typeof res.data == "object") {
+          // console.log(res.data.data);
+          resolve(res.data.data);
+        }
         reject(res.data);
-      }
-      if (typeof res.data == "object") {
-        // console.log(res.data.data);
-        resolve(res.data.data);
-      }
-      reject(res.data);
-      // else throw "Query error";
-    });
+        // else throw "Query error";
+      })
+      .catch((error) => {
+        reject(error.response);
+      });
   });
 };
 
