@@ -129,12 +129,14 @@ const searchEntityQueryMap = [
 //#endregion
 
 //#region Api request
-const searchDynamicEntity = (entityQueryMap, value) =>
-  request(`{
+const searchDynamicEntity = (entityQueryMap, value) => {
+  if (!value || value.length < 2) return Promise.resolve([]);
+  return request(`{
   solrSearchText(searchText: "${value}"){
     ${entityQueryMap.query}
   }
 }`).then(({ solrSearchText }) => solrSearchText[`${entityQueryMap.entity}s`]);
+};
 
 const fetchWorkEffortTypes = () =>
   request(`{
@@ -229,10 +231,13 @@ const useAuthUser = (enabled) => useQuery("user-auth", () => handleAuth(), { ena
 const useFetchActiveEmployeeByEmail = (email) => useQuery(`active-employee-${email}`, () => fetchActiveEmployeeByEmail(email), { enabled: email != null });
 
 const useGetEmailUniqueBodyAsText = (currentMSUser, messageId) =>
-  useQuery(`email-unique-body-${messageId}`, () => getUniqueEmailBodyAsText(currentMSUser, messageId), { enabled: false });
+  useQuery(`email-unique-body-${messageId}`, () => getUniqueEmailBodyAsText(currentMSUser, encodeURIComponent(messageId)), {
+    enabled: false,
+    staleTime: Infinity,
+  });
 
 const useGetRawEmailContents = (currentMSUser, messageId) =>
-  useQuery(`raw-email-${messageId}`, () => getEmailAsEml(currentMSUser, messageId), { enabled: false });
+  useQuery(`raw-email-${messageId}`, () => getEmailAsEml(currentMSUser, encodeURIComponent(messageId)), { enabled: false, staleTime: Infinity });
 
 const usePostAttachments = () => useMutation({ mutationFn: (args) => postAttachments(args) });
 
@@ -268,9 +273,15 @@ const ActivitySchema = Yup.object().shape({
 //#endregion
 
 const App = () => {
+  //#region ui/display state helpers
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const isOptionsMenuOpen = Boolean(anchorEl);
+  const handleOptionsMenuClick = (event) => setAnchorEl(event.currentTarget);
+  const handleOptionsMenuClose = () => setAnchorEl(null);
+  const toggleFullScreen = () => setIsFullScreen((prev) => !prev);
+  //#endregion
+
   //#region Form config
   const formik = useFormik({
     initialValues: {
@@ -348,12 +359,13 @@ const App = () => {
   const [emailItem, setEmailItem] = useState(null);
   const [emailAsAttachment, setEmailAsAttachment] = useState(null);
 
-  const [entitySearchStr, setEntitySearchStr] = useState("a");
-  const [productsSearchStr, setProductsSearchStr] = useState("a");
-  const [consultantsSearchStr, setConsultantsSearchStr] = useState("a");
-  const [investmentManagersSearchStr, setInvestmentManagersSearchStr] = useState("a");
-  const [employeesSearchStr, setEmployeesSearchStr] = useState("a");
+  const [entitySearchStr, setEntitySearchStr] = useState("");
+  const [productsSearchStr, setProductsSearchStr] = useState("");
+  const [consultantsSearchStr, setConsultantsSearchStr] = useState("");
+  const [investmentManagersSearchStr, setInvestmentManagersSearchStr] = useState("");
+  const [employeesSearchStr, setEmployeesSearchStr] = useState("");
   const [entityMapContext, setEntityMapContext] = useState(null);
+  const [modalCurrentField, setModalCurrentField] = useState(null);
   //#endregion
 
   //#region Queries & Mutations
@@ -370,7 +382,13 @@ const App = () => {
   const { data: investmentManagersSearchResults, isLoading: investmentManagersSearchResultsIsLoading } =
     useSearchInvestmentManagers(investmentManagersSearchStr);
   const { data: employeesSearchResults, isLoading: employeesSearchResultsIsLoading } = useSearchEmployees(employeesSearchStr);
-  const { data: currentMSUser, isLoading: loadingMsUser, isError: currentMsUserIsError, error: currentMsUserError } = useAuthUser(officeIsReady);
+  const {
+    data: currentMSUser,
+    isFetching: loadingMsUser,
+    isLoading: loadingMsUserInitial,
+    isError: currentMsUserIsError,
+    error: currentMsUserError,
+  } = useAuthUser(officeIsReady);
   const {
     data: activeEmployee,
     isError: activeEmployeeIsError,
@@ -412,8 +430,8 @@ const App = () => {
     // }
 
     if (currentMSUser) {
-      addEmailAsAttachment(); // auto attach email as attachment
-      copyEmailUniqueBodyToPublicComments(); // auto populate public comments with email body
+      if (!emailAsAttachment) addEmailAsAttachment(); // auto attach email as attachment
+      if (!formik.values.commentsClob) copyEmailUniqueBodyToPublicComments(); // auto populate public comments with email body
     }
   }, [
     // current user
@@ -440,6 +458,8 @@ const App = () => {
     setOfficeIsReady(true);
     setEmailItem(Office.context.mailbox.item);
 
+    //console.log(Office.context.mailbox.item);
+
     formik.setFieldValue("subject", Office.context.mailbox.item.normalizedSubject);
     formik.setFieldValue("workEffortDate", dayjs(new Date(Office.context.mailbox.item.dateTimeCreated)));
   }, [officeIsReady]);
@@ -451,11 +471,9 @@ const App = () => {
 
   //#region Helper Methods
   const isWorkEffortAvailable = (value) => toTrimAndLowerCase(value) === "plansponsor";
-  const showLoading = () => workEffortTypesLoading || formik.isSubmitting || officeIsReady == false || loadingMsUser || fetchingEmailRawContents;
+  const showLoading = () => workEffortTypesLoading || formik.isSubmitting || officeIsReady == false || loadingMsUserInitial || fetchingEmailRawContents;
   const canSubmit = () => formik.isSubmitting === false && showLoading() === false;
-  const handleOptionsMenuClick = (event) => setAnchorEl(event.currentTarget);
-  const handleOptionsMenuClose = () => setAnchorEl(null);
-  const toggleFullScreen = () => setIsFullScreen((prev) => !prev);
+
   const copyEmailUniqueBodyToPublicComments = async () => {
     const { data } = await fetchEmailUniqueBody();
     formik.setFieldValue("commentsClob", data?.uniqueBody?.content);
@@ -529,7 +547,7 @@ const App = () => {
                 sx={{ ml: 2 }}
                 onClick={() => {
                   formik.setFieldValue("workEffortTypeId", undefined);
-                  setEntitySearchStr("a");
+                  setEntitySearchStr("");
                 }}
               >
                 <ArrowBackIosIcon />
@@ -689,8 +707,8 @@ const App = () => {
                 getOptionKey={(option) => option[entityMapContext?.idField]}
                 loading={dynamicSearchResultsIsLoading}
                 onInputChange={(event, newValue) => setEntitySearchStr(newValue)}
-                isOptionEqualToValue={(option, value) => option[entityMapContext?.idField] === value[entityMapContext?.idField]}
-                onChange={(e, value) => formik.setFieldValue("primaryItemId", value[entityMapContext?.idField])}
+                isOptionEqualToValue={(option, value) => value && option[entityMapContext?.idField] === value[entityMapContext?.idField]}
+                onChange={(e, value) => formik.setFieldValue("primaryItemId", value ? value[entityMapContext?.idField] : null)}
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -763,50 +781,6 @@ const App = () => {
                   flexDirection: "column",
                 }}
               >
-                {/* full modal for editing */}
-                <Modal open={isFullScreen} onClose={toggleFullScreen} aria-labelledby="modal-title" aria-describedby="modal-description">
-                  <Box
-                    sx={{
-                      position: "relative",
-                      display: "flex",
-                      flexDirection: "column",
-                      height: "100%",
-                      bgcolor: "background.paper",
-                      boxShadow: 24,
-                      p: 4,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "7px",
-                      }}
-                    >
-                      <Tooltip title="Exit">
-                        <IconButton size="small" onClick={toggleFullScreen}>
-                          <FullscreenExitIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Link sx={{ cursor: "pointer", marginTop: "10px" }} onClick={() => formik.setFieldValue("commentsClob", "")}>
-                        Clear
-                      </Link>
-                    </Box>
-
-                    <TextField
-                      id="commentsClob"
-                      label="Public Comments"
-                      multiline
-                      focused={isFullScreen}
-                      sx={{ height: "100vh", flexGrow: "1", "& textarea": { resize: "vertical", minHeight: "80vh !important" } }}
-                      helperText={formik.touched.commentsClob && formik.errors.commentsClob}
-                      value={formik.values.commentsClob ?? ""}
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      error={formik.touched.commentsClob && Boolean(formik.errors.commentsClob)}
-                    />
-                  </Box>
-                </Modal>
                 <TextField
                   id="commentsClob"
                   label="Public Comments"
@@ -819,6 +793,7 @@ const App = () => {
                   onChange={formik.handleChange}
                   error={formik.touched.commentsClob && Boolean(formik.errors.commentsClob)}
                 />
+                {/* Action buttons */}
                 <Box
                   sx={{
                     display: "flex",
@@ -826,9 +801,14 @@ const App = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <Loading isLoading={fetchingEmailUniqueBody} />
                   <Tooltip title="Expand Public Comments">
-                    <IconButton size="small" onClick={toggleFullScreen}>
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        toggleFullScreen();
+                        setModalCurrentField({ id: "commentsClob", label: "Public Comments" });
+                      }}
+                    >
                       <FullscreenExitIcon />
                     </IconButton>
                   </Tooltip>
@@ -840,17 +820,49 @@ const App = () => {
                 </Box>
               </Box>
               {/* Private Comments */}
-              <TextField
-                id="privateComments"
-                label="Private Comments"
-                multiline
-                rows={4}
-                helperText={formik.touched.privateComments && formik.errors.privateComments}
-                value={formik.values.privateComments}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                error={formik.touched.privateComments && Boolean(formik.errors.privateComments)}
-              />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <TextField
+                  id="privateComments"
+                  label="Private Comments"
+                  multiline
+                  rows={4}
+                  helperText={formik.touched.privateComments && formik.errors.privateComments}
+                  value={formik.values.privateComments}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  error={formik.touched.privateComments && Boolean(formik.errors.privateComments)}
+                />
+                {/* Action buttons */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Tooltip title="Expand Private Comments">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        toggleFullScreen();
+                        setModalCurrentField({ id: "privateComments", label: "Private Comments" });
+                      }}
+                    >
+                      <FullscreenExitIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Clear Private Comments">
+                    <Link sx={{ cursor: "pointer", marginTop: "7px" }} onClick={() => formik.setFieldValue("privateComments", "")}>
+                      Clear
+                    </Link>
+                  </Tooltip>
+                </Box>
+              </Box>
               {/* Products */}
               <Autocomplete
                 disablePortal
@@ -1026,6 +1038,59 @@ const App = () => {
             ) : null}
           </Box>
         </Box>
+        {/* full modal for editing */}
+        <Modal open={isFullScreen} onClose={toggleFullScreen} aria-labelledby="modal-title" aria-describedby="modal-description">
+          <Box
+            sx={{
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              height: "100%",
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "7px",
+              }}
+            >
+              <Tooltip title="Exit">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    toggleFullScreen();
+                    setModalCurrentField(null);
+                  }}
+                >
+                  <ArrowBackIosIcon />
+                </IconButton>
+              </Tooltip>
+              <Link sx={{ cursor: "pointer", marginTop: "10px" }} onClick={() => formik.setFieldValue(`${modalCurrentField?.id}`, "")}>
+                Clear
+              </Link>
+            </Box>
+            {modalCurrentField ? (
+              <>
+                <TextField
+                  id={`${modalCurrentField?.id}`}
+                  label={`${modalCurrentField?.label}`}
+                  multiline
+                  focused={isFullScreen}
+                  sx={{ height: "100vh", flexGrow: "1", "& textarea": { resize: "vertical", minHeight: "80vh !important" } }}
+                  helperText={formik.touched[modalCurrentField?.id] && formik.errors[modalCurrentField?.id]}
+                  value={formik.values[modalCurrentField?.id] ?? ""}
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  error={formik.touched[modalCurrentField?.id] && Boolean(formik.errors[modalCurrentField?.id])}
+                />
+              </>
+            ) : null}
+          </Box>
+        </Modal>
       </form>
     </>
   );
