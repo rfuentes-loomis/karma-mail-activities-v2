@@ -1,5 +1,4 @@
-name: Build and Deploy VN
-
+name: Build and Deploy VN UAT
 on:
   push:
     branches: ["uat"]
@@ -9,7 +8,7 @@ jobs:
     environment: vaughan-nelson-uat
     env:
       # common
-      NODE_VERSION: "20.9.0"
+      NODE_VERSION: ${{ vars.NODE_VERSION }}
       AZURE_BACKEND_WEBAPP_NAME: ${{ vars.AZURE_BACKEND_WEBAPP_NAME }}
       NEXT_PUBLIC_DHARMA_API: ${{ vars.NEXT_PUBLIC_DHARMA_API }}
       NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ vars.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
