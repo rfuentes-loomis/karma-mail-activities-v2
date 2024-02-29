@@ -66,10 +66,10 @@ jobs:
       #     cd ./build/standalone
       #     zip -r ../../release.zip .
       # - name: "Deploy to Azure Web App"
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_BACKEND_WEBAPP_NAME}}
-          publish-profile: ${{ env.AZURE_BACKEND_PUBLISH_PROFILE}}
-          package: "release.zip"
-          startUpCommand: "npm run start:prod"
+        # id: deploy-to-webapp
+        # uses: azure/webapps-deploy@v2
+        # with:
+        #   app-name: ${{ env.AZURE_BACKEND_WEBAPP_NAME}}
+        #   publish-profile: ${{ env.AZURE_BACKEND_PUBLISH_PROFILE}}
+        #   package: "release.zip"
+        #   startUpCommand: "npm run start:prod"
