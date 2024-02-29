@@ -2,7 +2,7 @@ name: Build and Deploy VN
 
 on:
   push:
-    branches: ["main"]
+    branches: ["uat"]
 jobs:
   build_deploy_uat:
     runs-on: ubuntu-latest
@@ -19,57 +19,53 @@ jobs:
       AZURE_AD_SCOPES: ${{ vars.AZURE_AD_SCOPES }}
       AZURE_BACKEND_PUBLISH_PROFILE: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
     steps:
-      - name: Test vars
-        run: | 
-          echo "NODE_VERSION:${{ env.NODE_VERSION }}"
-          echo "AZURE_BACKEND_WEBAPP_NAME:${{ env.AZURE_BACKEND_WEBAPP_NAME }}"
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      #   # setup nodejs environment
-      # - name: Setup Node.js environment
-      #   uses: actions/setup-node@v2.1.5
-      #   with:
-      #     node-version: ${{ env.NODE_VERSION }}
-      #   #cache the dependencies to speed up the build
-      # - name: Cache dependencies
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: |
-      #       ~/.npm
-      #       ${{ github.workspace }}/.next/cache
-      #     # Generate a new cache whenever packages or source files change.
-      #     key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-      #     # If source files changed but packages didn't, rebuild from a prior cache.
-      #     restore-keys: |
-      #       ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-      # - name: .env file setup
-      #   uses: SpicyPizza/create-envfile@v2.0
-      #   with:
-      #     envkey_AZURE_AD_SECRET: ${{ env.AZURE_AD_SECRET }}
-      #     envkey_AZURE_AD_CLIENTID: ${{ env.AZURE_AD_CLIENTID }}
-      #     envkey_AZURE_AD_TENANTID: ${{ env.AZURE_AD_TENANTID }}
-      #     envkey_AZURE_AD_SCOPES: ${{ env.AZURE_AD_SCOPES }}
-      #     envkey_NEXT_PUBLIC_DHARMA_API: ${{ env.NEXT_PUBLIC_DHARMA_API }}
-      #     envkey_NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
-      #     directory: "."
-      #     file_name: ".env"
-      #     fail_on_empty: false
-      #     sort_keys: false
-      # - name: Install dependencies & Build
-      #   run: |
-      #     npm ci 
-      #     npm run build
-      #     cp -r ./build/static ./build/standalone/build
-      #     cp -r ./public ./build/standalone
-      # - name: Copy Deployment Package
-      #   run: |
-      #     cd ./build/standalone
-      #     zip -r ../../release.zip .
-      # - name: "Deploy to Azure Web App"
-        # id: deploy-to-webapp
-        # uses: azure/webapps-deploy@v2
-        # with:
-        #   app-name: ${{ env.AZURE_BACKEND_WEBAPP_NAME}}
-        #   publish-profile: ${{ env.AZURE_BACKEND_PUBLISH_PROFILE}}
-        #   package: "release.zip"
-        #   startUpCommand: "npm run start:prod"
+      - name: Checkout
+        uses: actions/checkout@v3
+        # setup nodejs environment
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+        #cache the dependencies to speed up the build
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.next/cache
+          # Generate a new cache whenever packages or source files change.
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          # If source files changed but packages didn't, rebuild from a prior cache.
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+      - name: .env file setup
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_AZURE_AD_SECRET: ${{ env.AZURE_AD_SECRET }}
+          envkey_AZURE_AD_CLIENTID: ${{ env.AZURE_AD_CLIENTID }}
+          envkey_AZURE_AD_TENANTID: ${{ env.AZURE_AD_TENANTID }}
+          envkey_AZURE_AD_SCOPES: ${{ env.AZURE_AD_SCOPES }}
+          envkey_NEXT_PUBLIC_DHARMA_API: ${{ env.NEXT_PUBLIC_DHARMA_API }}
+          envkey_NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
+          directory: "."
+          file_name: ".env"
+          fail_on_empty: false
+          sort_keys: false
+      - name: Install dependencies & Build
+        run: |
+          npm ci 
+          npm run build
+          cp -r ./build/static ./build/standalone/build
+          cp -r ./public ./build/standalone
+      - name: Copy Deployment Package
+        run: |
+          cd ./build/standalone
+          zip -r ../../release.zip .
+      - name: "Deploy to Azure Web App"
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_BACKEND_WEBAPP_NAME}}
+          publish-profile: ${{ env.AZURE_BACKEND_PUBLISH_PROFILE}}
+          package: "release.zip"
+          startUpCommand: "npm run start:prod"
