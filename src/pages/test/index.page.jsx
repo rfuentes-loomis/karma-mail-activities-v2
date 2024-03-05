@@ -10,6 +10,8 @@ function Home() {
     setEmailItem(Office?.context?.mailbox?.item);
     setOfficeIsReady(true);
   }, [officeIsReady]);
+
+  
   useEffect(() => {
     Office.onReady(officeOnReadyCallback);
   }, [officeOnReadyCallback]);
