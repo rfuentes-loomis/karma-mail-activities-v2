@@ -12,6 +12,7 @@ jobs:
       AZURE_BACKEND_WEBAPP_NAME: ${{ vars.AZURE_BACKEND_WEBAPP_NAME }}
       NEXT_PUBLIC_DHARMA_API: ${{ vars.NEXT_PUBLIC_DHARMA_API }}
       NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ vars.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
+      DHARMA_PROXY: ${{ vars.DHARMA_PROXY }}
       AZURE_AD_SECRET: ${{ secrets.AZURE_AD_SECRET }}
       AZURE_AD_CLIENTID: ${{ vars.AZURE_AD_CLIENTID }}
       AZURE_AD_TENANTID: ${{ vars.AZURE_AD_TENANTID }}
@@ -44,6 +45,7 @@ jobs:
           envkey_AZURE_AD_CLIENTID: ${{ env.AZURE_AD_CLIENTID }}
           envkey_AZURE_AD_TENANTID: ${{ env.AZURE_AD_TENANTID }}
           envkey_AZURE_AD_SCOPES: ${{ env.AZURE_AD_SCOPES }}
+          envkey_DHARMA_PROXY: ${{ env.DHARMA_PROXY }}
           envkey_NEXT_PUBLIC_DHARMA_API: ${{ env.NEXT_PUBLIC_DHARMA_API }}
           envkey_NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
           directory: "."

@@ -10,6 +10,10 @@ const nextConfig = {
         source: "/outlook",
         destination: "/public/outlook/index.html",
       },
+      {
+        source: "/api/graphql/:path*",
+        destination: `${process.env.DHARMA_PROXY}:path*`,
+      },
     ];
   },
 };
