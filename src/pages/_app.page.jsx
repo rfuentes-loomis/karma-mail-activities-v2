@@ -29,14 +29,14 @@ export default function App({ Component, pageProps }) {
     <>
       {/* https://learn.microsoft.com/en-us/answers/questions/1070090/using-office-javascript-api-in-next-js */}
       {/* Local dev hack */}
-      {process.env.NODE_ENV !== "production" && (
+      {
         <Script
           id="store_replaceState"
           dangerouslySetInnerHTML={{
             __html: "window._replaceState = window.replaceState",
           }}
         />
-      )}
+      }
       <Script
         async
         type="text/javascript"
@@ -45,7 +45,7 @@ export default function App({ Component, pageProps }) {
         onLoad={() => setLoadedOffice(true)}
       ></Script>
       {/* Local dev hack */}
-      {process.env.NODE_ENV !== "production" && loadedOffice && (
+      {loadedOffice && (
         <Script
           id="assign_replaceState"
           dangerouslySetInnerHTML={{
