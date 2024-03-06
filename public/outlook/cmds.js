@@ -8,6 +8,12 @@ Office.initialize = function (reason) {
   document.getElementById(thegoods).innerHTML = "initialize complete </br>" + JSON.stringify(mailboxItem)
 };
 
+Office.onReady(() => {
+  mailboxItem = Office.context.mailbox.item;
+
+  document.getElementById(thegoods).innerHTML = "On Ready complete </br>" + JSON.stringify(mailboxItem)
+})
+
 function validateOnSend(eventArgs) {
   console.log("validateOnSend", eventArgs);
   //   // Prevent the item from being sent immediately
