@@ -8,6 +8,7 @@ Office.initialize = function (reason) {
   try {
     mailboxItem = Office.context.mailbox.item;
 
+    document.getElementById(thegoods).innerHTML += "</br>from initialize:</br>" + JSON.stringify(mailboxItem?.itemId);
     document.getElementById(thegoods).innerHTML += "</br>from initialize:</br>" + JSON.stringify(mailboxItem);
     document.getElementById(thegoods).innerHTML += "</br>Mailbox from initialize:</br>" + JSON.stringify(Office.context.mailbox);
   } catch (error) {}
@@ -19,6 +20,7 @@ Office.onReady(() => {
   try {
     mailboxItem = Office.context.mailbox.item;
 
+    document.getElementById(thegoods).innerHTML += "</br>Item from onReady:</br>" + JSON.stringify(mailboxItem?.itemId);
     document.getElementById(thegoods).innerHTML += "</br>Item from onReady:</br>" + JSON.stringify(mailboxItem);
     document.getElementById(thegoods).innerHTML += "</br>Mailbox from onReady:</br>" + JSON.stringify(Office.context.mailbox);
   } catch (error) {}
