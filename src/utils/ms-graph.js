@@ -30,7 +30,13 @@ async function validateJwt(authHeader) {
       audience: process.env.AZURE_AD_CLIENTID,
     };
 
-    return await verifyToken(token, getSigningKeys, validationOptions);
+    try {
+      const results = await verifyToken(token, getSigningKeys, validationOptions);
+      return results;
+    } catch (error) {
+      throw error;
+    }
+
   }
 }
 

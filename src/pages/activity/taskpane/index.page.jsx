@@ -457,9 +457,9 @@ const App = () => {
     // Office.context.mailbox.item.from; // object {emailAddress,displayName }
     setOfficeIsReady(true);
     setEmailItem(Office.context.mailbox.item);
-
-    //console.log(Office.context.mailbox.item);
-
+    //userProfile
+    //console.log(Office.context.mailbox);
+    //Office.context.mailbox.getCallbackTokenAsync((d) => console.log(d));
     formik.setFieldValue("subject", Office.context.mailbox.item.normalizedSubject);
     formik.setFieldValue("workEffortDate", dayjs(new Date(Office.context.mailbox.item.dateTimeCreated)));
   }, [officeIsReady]);
