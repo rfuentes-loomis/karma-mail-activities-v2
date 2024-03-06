@@ -38,6 +38,7 @@ export default function App({ Component, pageProps }) {
   //#endregion
   return (
     <>
+
       <ThemeProvider theme={Theme}>
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>

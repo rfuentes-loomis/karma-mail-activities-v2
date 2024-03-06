@@ -24,12 +24,12 @@ function Home() {
 
   return (
     <Box>
-      <Box>officeIsReady:{officeIsReady}</Box>
+      <Box>officeIsReady:{officeIsReady ? "true" : "false"}</Box>
       <Box>emailItem:{emailItem?.itemId}</Box>
-      <Box>loadingMsUser:{loadingMsUser}</Box>
-      <Box>loadingMsUserInitial:{loadingMsUserInitial}</Box>
+      <Box>loadingMsUser:{loadingMsUser? "true" : "false"}</Box>
+      <Box>loadingMsUserInitial:{loadingMsUserInitial? "true" : "false"}</Box>
 
-      <Box>currentMsUserIsError:{currentMsUserIsError}</Box>
+      <Box>currentMsUserIsError:{currentMsUserIsError? "true" : "false"}</Box>
 
       <Box>
         currentMSUser: <pre>{JSON.stringify(currentMSUser, null, 2)} </pre>
