@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Head from "next/head";
 import Script from "next/script";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -24,12 +24,25 @@ const queryClient = new QueryClient({
 });
 
 export default function App({ Component, pageProps }) {
+  const [officeIsReady, setOfficeIsReady] = useState(false);
+
+  //#region Handle Office On Ready & set Default values
+  const officeOnReadyCallback = useCallback(() => {
+    if (officeIsReady) return;
+    setOfficeIsReady(true);
+  }, [officeIsReady]);
+  useEffect(() => {
+    Office.onReady(officeOnReadyCallback);
+  }, [officeOnReadyCallback]);
+
+  //#endregion
   return (
     <>
       <ThemeProvider theme={Theme}>
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Component {...pageProps} />
+            <Loading center isLoading={officeIsReady == false} />
+            {officeIsReady ? <Component {...pageProps} /> : <></>}
           </LocalizationProvider>
         </QueryClientProvider>
       </ThemeProvider>
