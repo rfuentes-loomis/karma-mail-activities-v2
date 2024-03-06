@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }) {
         crossOrigin="anonymous"
         onLoad={() => {
           Office.initialize = (reason) => {
-            setD("`initialize: ${reason}`");
+            setD(`initialize: ${reason}`);
             console.log(`initialize: ${reason}`);
             setLoadedOffice(true);
             forceUpdate();
@@ -67,7 +67,6 @@ export default function App({ Component, pageProps }) {
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Loading center isLoading={loadedOffice == false} />
             {d}
-            {Office?.context?.mailbox?.item?.itemId}
             {loadedOffice ? <Component {...pageProps} /> : null}
           </LocalizationProvider>
         </QueryClientProvider>
