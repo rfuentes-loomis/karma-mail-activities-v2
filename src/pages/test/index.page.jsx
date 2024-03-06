@@ -24,9 +24,14 @@ function Home() {
 
   return (
     <Box>
-      {emailItem?.itemId}
-
-      <pre>{JSON.stringify(currentMSUser, null, 2)} </pre>
+      <Box>emailItem:{emailItem?.itemId}</Box>
+      <Box>loadingMsUser:{loadingMsUser}</Box>
+      <Box>
+        currentMSUser: <pre>{JSON.stringify(currentMSUser, null, 2)} </pre>
+      </Box>
+      <Box>
+        currentMsUserError:<pre>{JSON.stringify(currentMsUserError, null, 2)} </pre>
+      </Box>
     </Box>
   );
 }
