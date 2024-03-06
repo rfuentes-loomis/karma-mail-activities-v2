@@ -226,7 +226,7 @@ const useSearchEmployees = (value) =>
   );
 const useInsertActivity = () => useMutation({ mutationFn: (args) => insertActivityMutation(args) });
 
-const useAuthUser = (enabled) => useQuery("user-auth", () => handleAuth(), { enabled, staleTime: 150 * 1000, refetchInterval: 150 * 1000 });
+export const useAuthUser = (enabled) => useQuery("user-auth", () => handleAuth(), { enabled, staleTime: 150 * 1000, refetchInterval: 150 * 1000 });
 
 const useFetchActiveEmployeeByEmail = (email) => useQuery(`active-employee-${email}`, () => fetchActiveEmployeeByEmail(email), { enabled: email != null });
 
