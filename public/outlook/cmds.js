@@ -2,14 +2,16 @@ console.log("cmds");
 let thegoods = "thegoods";
 let mailboxItem;
 
-Office.initialize = function (reason) {
-  document.getElementById(thegoods).innerHTML = "initialize complete </br>";
-  mailboxItem = Office.context.mailbox.item;
-};
+Office.initialize = function (reason) {};
 
 Office.onReady(() => {
   document.getElementById(thegoods).innerHTML = "On Ready complete </br>";
-  mailboxItem = Office.context.mailbox.item;
+
+  try {
+    mailboxItem = Office.context.mailbox.item;
+
+    document.getElementById(thegoods).innerHTML += "</br>" + JSON.stringify(mailboxItem);
+  } catch (error) {}
 });
 
 function validateOnSend(eventArgs) {
