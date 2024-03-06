@@ -48,7 +48,7 @@ export default function App({ Component, pageProps }) {
             setD(`initialize: ${reason}`);
             console.log(`initialize: ${reason}`);
             setLoadedOffice(true);
-            forceUpdate();
+            //forceUpdate();
           }; // MUST BE BEFORE Office.onReady
         }}
       ></Script>
