@@ -18,7 +18,7 @@ function Home() {
   return (
     <Box>
       {emailItem ? "yes" : "no"}
-      <pre>{emailItem}</pre>
+      {emailItem?.itemId}
     </Box>
   );
 }
