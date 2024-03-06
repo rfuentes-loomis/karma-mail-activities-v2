@@ -40,7 +40,7 @@ function Home() {
       <Box>
         currentMsUserError:<pre>{JSON.stringify(currentMsUserError, null, 2)} </pre>
       </Box>
-      <Box>userProfile:{userProfile}</Box>
+      <Box>userProfile:{JSON.stringify(userProfile, null, 2)}</Box>
     </Box>
   );
 }
