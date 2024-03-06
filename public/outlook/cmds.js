@@ -1,9 +1,11 @@
 console.log("cmds");
-
+let thegoods = "#thegoods";
 let mailboxItem;
 
 Office.initialize = function (reason) {
   mailboxItem = Office.context.mailbox.item;
+
+  document.getElementById(thegoods).innerHTML = "initialize complete </br>" + JSON.stringify(mailboxItem)
 };
 
 function validateOnSend(eventArgs) {

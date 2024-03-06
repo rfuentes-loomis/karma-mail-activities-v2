@@ -11,15 +11,16 @@ function Home() {
     setOfficeIsReady(true);
   }, [officeIsReady]);
 
-  
   useEffect(() => {
     Office.onReady(officeOnReadyCallback);
   }, [officeOnReadyCallback]);
 
-  return <Box>
-
-    <pre>{emailItem}</pre>
-  </Box>;
+  return (
+    <Box>
+      {emailItem ? "yes" : "no"}
+      <pre>{emailItem}</pre>
+    </Box>
+  );
 }
 
 export default Home;
