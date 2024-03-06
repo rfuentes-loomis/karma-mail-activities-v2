@@ -26,7 +26,7 @@ const queryClient = new QueryClient({
 export default function App({ Component, pageProps }) {
   const [loadedOffice, setLoadedOffice] = useState(false);
   const [d, setD] = useState(null);
-
+  const forceUpdate = React.useCallback(() => setLoadedOffice(true), []);
   return (
     <>
       {/* https://learn.microsoft.com/en-us/answers/questions/1070090/using-office-javascript-api-in-next-js */}
@@ -47,6 +47,7 @@ export default function App({ Component, pageProps }) {
           Office.initialize = (reason) => {
             setD(`initialize: ${reason}`);
             setLoadedOffice(true);
+            forceUpdate();
           };
         }}
       ></Script>

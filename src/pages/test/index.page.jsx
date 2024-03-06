@@ -6,7 +6,6 @@ function Home() {
   const [officeIsReady, setOfficeIsReady] = useState(false);
   const [emailItem, setEmailItem] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
-  const [d, setD] = useState(null);
 
   const {
     data: currentMSUser,
