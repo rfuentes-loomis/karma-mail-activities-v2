@@ -24,50 +24,12 @@ const queryClient = new QueryClient({
 });
 
 export default function App({ Component, pageProps }) {
-  const [loadedOffice, setLoadedOffice] = useState(false);
-  const [d, setD] = useState(null);
-  const forceUpdate = React.useCallback(() => setLoadedOffice(true), []);
   return (
     <>
-      {/* https://learn.microsoft.com/en-us/answers/questions/1070090/using-office-javascript-api-in-next-js */}
-      {/* Local dev hack */}
-      {process.env.NODE_ENV !== "production" && (
-        <Script
-          id="store_replaceState"
-          dangerouslySetInnerHTML={{
-            __html: "window._replaceState = window.replaceState",
-          }}
-        />
-      )}
-      <Script
-        async
-        type="text/javascript"
-        src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
-        crossOrigin="anonymous"
-        onLoad={() => {
-          Office.initialize = (reason) => {
-            setD(`initialize: ${reason}`);
-            console.log(`initialize: ${reason}`);
-            setLoadedOffice(true);
-            forceUpdate();
-          }; // MUST BE BEFORE Office.onReady
-        }}
-      ></Script>
-      {/* Local dev hack */}
-      {process.env.NODE_ENV !== "production" && loadedOffice && (
-        <Script
-          id="assign_replaceState"
-          dangerouslySetInnerHTML={{
-            __html: "window.history.replaceState = window._replaceState",
-          }}
-        />
-      )}
       <ThemeProvider theme={Theme}>
         <QueryClientProvider client={queryClient}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Loading center isLoading={loadedOffice == false} />
-            {d}
-            {loadedOffice ? <Component {...pageProps} /> : null}
+            <Component {...pageProps} />
           </LocalizationProvider>
         </QueryClientProvider>
       </ThemeProvider>
