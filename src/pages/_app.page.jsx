@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }) {
     <>
       {/* https://learn.microsoft.com/en-us/answers/questions/1070090/using-office-javascript-api-in-next-js */}
       {/* Local dev hack */}
-      {process.env.NODE_ENV !== "production" && (
+      {(
         <Script
           id="store_replaceState"
           dangerouslySetInnerHTML={{
@@ -40,7 +40,6 @@ export default function App({ Component, pageProps }) {
         />
       )}
       <Script
-        
         type="text/javascript"
         src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
         crossOrigin="anonymous"
@@ -54,11 +53,11 @@ export default function App({ Component, pageProps }) {
         }}
       ></Script>
       {/* Local dev hack */}
-      {process.env.NODE_ENV !== "production" && loadedOffice && (
+      { loadedOffice && (
         <Script
           id="assign_replaceState"
           dangerouslySetInnerHTML={{
-            __html: "window.history.replaceState = window._replaceState",
+            __html: "window.history.replaceState = window._replaceState;Office.initialize = function (){}",
           }}
         />
       )}

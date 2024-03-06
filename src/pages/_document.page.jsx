@@ -7,7 +7,7 @@ export default function Document() {
       <Head>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=Edge" />
-        <Script
+        {/* <Script
           strategy="beforeInteractive"
           type="text/javascript"
           src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
@@ -18,7 +18,7 @@ export default function Document() {
           dangerouslySetInnerHTML={{
             __html: "Office.initialize = function (){}",
           }}
-        />
+        /> */}
       </Head>
       <body>
         <Main />
