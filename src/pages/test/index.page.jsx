@@ -24,8 +24,13 @@ function Home() {
 
   return (
     <Box>
+      <Box>officeIsReady:{officeIsReady}</Box>
       <Box>emailItem:{emailItem?.itemId}</Box>
       <Box>loadingMsUser:{loadingMsUser}</Box>
+      <Box>loadingMsUserInitial:{loadingMsUserInitial}</Box>
+
+      <Box>currentMsUserIsError:{currentMsUserIsError}</Box>
+
       <Box>
         currentMSUser: <pre>{JSON.stringify(currentMSUser, null, 2)} </pre>
       </Box>
