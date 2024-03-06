@@ -43,8 +43,10 @@ export default function App({ Component, pageProps }) {
         src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"
         crossOrigin="anonymous"
         onLoad={() => {
+          Office.initialize = (reason) => {
+            console.log(`initialize: ${reason}`);
+          }; // MUST BE BEFORE Office.onReady
           setLoadedOffice(true);
-          Office.initialize = () => {}; // MUST BE BEFORE Office.onReady
         }}
       ></Script>
       {/* Local dev hack */}

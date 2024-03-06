@@ -19,6 +19,8 @@ function Home() {
     <Box>
       {emailItem ? "yes" : "no"}
       <pre>{emailItem}</pre>
+
+      {Office?.context?.mailbox?.item?.itemId}
     </Box>
   );
 }
