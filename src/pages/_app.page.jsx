@@ -45,8 +45,8 @@ export default function App({ Component, pageProps }) {
         onLoad={() => {
           Office.initialize = (reason) => {
             console.log(`initialize: ${reason}`);
+            setLoadedOffice(true);
           }; // MUST BE BEFORE Office.onReady
-          setLoadedOffice(true);
         }}
       ></Script>
       {/* Local dev hack */}
