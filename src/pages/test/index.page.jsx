@@ -7,6 +7,7 @@ function Home() {
   const [emailItem, setEmailItem] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [tokenResponse, setTokenResponse] = useState(null);
+  const [tokenResponseError, setTokenResponseError] = useState(null);
 
   const {
     data: currentMSUser,
@@ -37,9 +38,9 @@ function Home() {
         forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
       });
 
-      setTokenResponse(accessToken)
+      setTokenResponse(accessToken);
     } catch (error) {
-      setTokenResponse(error)
+      setTokenResponseError({ error, msg: "we got an error" });
     }
   };
 
@@ -59,7 +60,8 @@ function Home() {
         currentMsUserError:<pre>{JSON.stringify(currentMsUserError, null, 2)} </pre>
       </Box>
       <Box>userProfile:{JSON.stringify(userProfile, null, 2)}</Box>
-      <Box>tokenResponse:{JSON.stringify(tokenResponse, null, 2)}</Box>
+      <Box>tokenResponseError:{JSON.stringify(tokenResponseError, null, 2)}</Box>
+      <Box>tokenResponse:{tokenResponse}</Box>
       <button onClick={onClick}>click</button>
     </Box>
   );
