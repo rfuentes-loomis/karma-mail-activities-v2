@@ -32,13 +32,8 @@ function Home() {
 
   const onClick = async () => {
     try {
-      const accessToken = await Office.auth.getAccessToken({
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-        forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
-      });
 
-      setTokenResponse(accessToken);
+      setTokenResponse(Office.mailbox);
     } catch (error) {
       setTokenResponseError({ error, msg: "we got an error" });
     }
