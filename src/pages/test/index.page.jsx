@@ -6,6 +6,7 @@ function Home() {
   const [officeIsReady, setOfficeIsReady] = useState(false);
   const [emailItem, setEmailItem] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [tokenResponse, setTokenResponse] = useState(null);
 
   const {
     data: currentMSUser,
@@ -21,20 +22,26 @@ function Home() {
     setUserProfile(Office?.context?.mailbox?.userProfile);
     setOfficeIsReady(true);
 
-    Office.auth.getAccessToken(
-      {
-        allowSignInPrompt: true,
-        allowConsentPrompt: true,
-        forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
-      },
-      (d) => setUserProfile
-    );
-    //Office.context.mailbox.getUserIdentityTokenAsync();
+    Office.context.mailbox.getUserIdentityTokenAsync((d) => setUserProfile);
   }, [officeIsReady]);
 
   useEffect(() => {
     Office.onReady(officeOnReadyCallback);
   }, [officeOnReadyCallback]);
+
+  const onClick = async () => {
+    try {
+      const accessToken = await Office.auth.getAccessToken({
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+        forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
+      });
+
+      setTokenResponse(accessToken)
+    } catch (error) {
+      setTokenResponse(error)
+    }
+  };
 
   return (
     <Box>
@@ -52,6 +59,8 @@ function Home() {
         currentMsUserError:<pre>{JSON.stringify(currentMsUserError, null, 2)} </pre>
       </Box>
       <Box>userProfile:{JSON.stringify(userProfile, null, 2)}</Box>
+      <Box>tokenResponse:{JSON.stringify(tokenResponse, null, 2)}</Box>
+      <button onClick={onClick}>click</button>
     </Box>
   );
 }
