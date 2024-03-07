@@ -17,8 +17,19 @@ function Home() {
   const officeOnReadyCallback = useCallback(() => {
     if (officeIsReady) return;
     setEmailItem(Office?.context?.mailbox?.item);
+    console.log(Office?.context?.mailbox);
     setUserProfile(Office?.context?.mailbox?.userProfile);
     setOfficeIsReady(true);
+
+    Office.auth.getAccessToken(
+      {
+        allowSignInPrompt: true,
+        allowConsentPrompt: true,
+        forMSGraphAccess: false, // ?? changed for outlook mac desktop client from true to false because of error
+      },
+      (d) => setUserProfile
+    );
+    //Office.context.mailbox.getUserIdentityTokenAsync();
   }, [officeIsReady]);
 
   useEffect(() => {
