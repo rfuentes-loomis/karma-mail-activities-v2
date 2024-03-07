@@ -20,7 +20,7 @@ function Home() {
     if (officeIsReady) return;
     setEmailItem(Office?.context?.mailbox?.item);
     console.log(Office?.context?.mailbox);
-    setUserProfile(Office?.context?.mailbox?.userProfile?.email);
+    setUserProfile(Office?.context?.mailbox?.userProfile?.emailAddress);
     setOfficeIsReady(true);
 
     Office.context.mailbox.getUserIdentityTokenAsync((d) => setUserProfile);
@@ -32,7 +32,6 @@ function Home() {
 
   const onClick = async () => {
     try {
-
       setTokenResponse(Office.mailbox);
     } catch (error) {
       setTokenResponseError({ error, msg: "we got an error" });
@@ -42,6 +41,9 @@ function Home() {
   return (
     <Box>
       <Box>officeIsReady:{officeIsReady ? "true" : "false"}</Box>
+      <Box>
+        emailItem:<pre>{JSON.stringify(emailItem, null, 2)} </pre>
+      </Box>
       <Box>emailItem:{emailItem?.itemId}</Box>
       <Box>loadingMsUser:{loadingMsUser ? "true" : "false"}</Box>
       <Box>loadingMsUserInitial:{loadingMsUserInitial ? "true" : "false"}</Box>
@@ -54,7 +56,7 @@ function Home() {
       <Box>
         currentMsUserError:<pre>{JSON.stringify(currentMsUserError, null, 2)} </pre>
       </Box>
-      <Box>userProfile:{JSON.stringify(userProfile, null, 2)}</Box>
+      <Box>userProfile:{userProfile}</Box>
       <Box>tokenResponseError:{JSON.stringify(tokenResponseError, null, 2)}</Box>
       <Box>tokenResponse:{tokenResponse}</Box>
       <button onClick={onClick}>click</button>
