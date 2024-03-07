@@ -20,7 +20,7 @@ function Home() {
     if (officeIsReady) return;
     setEmailItem(Office?.context?.mailbox?.item);
     console.log(Office?.context?.mailbox);
-    setUserProfile(Office?.context?.mailbox?.userProfile);
+    setUserProfile(Office?.context?.mailbox?.userProfile?.email);
     setOfficeIsReady(true);
 
     Office.context.mailbox.getUserIdentityTokenAsync((d) => setUserProfile);
