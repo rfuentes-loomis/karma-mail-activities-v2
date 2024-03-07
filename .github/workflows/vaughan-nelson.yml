@@ -1,5 +1,6 @@
 name: Build and Deploy VN UAT
 on:
+  workflow_dispatch:
   push:
     branches: ["uat"]
 jobs:
@@ -17,6 +18,7 @@ jobs:
       AZURE_AD_CLIENTID: ${{ vars.AZURE_AD_CLIENTID }}
       AZURE_AD_TENANTID: ${{ vars.AZURE_AD_TENANTID }}
       AZURE_AD_SCOPES: ${{ vars.AZURE_AD_SCOPES }}
+      AZURE_AD_SCOPES: ${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}
       AZURE_BACKEND_PUBLISH_PROFILE: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
     steps:
       - name: Checkout
@@ -47,6 +49,7 @@ jobs:
           envkey_AZURE_AD_SCOPES: ${{ env.AZURE_AD_SCOPES }}
           envkey_DHARMA_PROXY: ${{ env.DHARMA_PROXY }}
           envkey_NEXT_PUBLIC_DHARMA_API: ${{ env.NEXT_PUBLIC_DHARMA_API }}
+          envkey_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ env.APPLICATIONINSIGHTS_CONNECTION_STRING }}
           envkey_NEXT_PUBLIC_USER_TOKEN_ENDPOINT: ${{ env.NEXT_PUBLIC_USER_TOKEN_ENDPOINT }}
           directory: "."
           file_name: ".env"
@@ -69,4 +72,4 @@ jobs:
           app-name: ${{ env.AZURE_BACKEND_WEBAPP_NAME}}
           publish-profile: ${{ env.AZURE_BACKEND_PUBLISH_PROFILE}}
           package: "release.zip"
-          startUpCommand: "npm run start:prod"
+          startUpCommand: "npm run start:prod2"
