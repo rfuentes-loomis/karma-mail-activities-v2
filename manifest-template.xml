@@ -15,6 +15,7 @@
   <SupportUrl DefaultValue="https://www.loomis.com/help" />
   <AppDomains>
     <AppDomain>https://www.loomis.com</AppDomain>
+    <AppDomain>{{appUri}}</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox" />
@@ -78,7 +79,6 @@
                 </Group>
               </OfficeTab>
             </ExtensionPoint> -->
-
             <!-- Message Read -->
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="TabDefault">
@@ -102,17 +102,48 @@
                 </Group>
               </OfficeTab>
             </ExtensionPoint>
-
           </DesktopFormFactor>
+          <!-- Mobile -->
+          <MobileFormFactor>
+            <FunctionFile resid="Commands.Url" />
+            <ExtensionPoint xsi:type="MobileMessageReadCommandSurface">
+              <Group id="mobileMsgRead">
+                <Label resid="GroupLabel" />
+                <Control xsi:type="MobileButton" id="TaskPaneBtn">
+                  <Label resid="TaskpaneButton.Label" />
+                  <Icon xsi:type="bt:MobileIconList">
+                    <bt:Image size="25" scale="1" resid="Icon.25" />
+                    <bt:Image size="25" scale="2" resid="Icon.25" />
+                    <bt:Image size="25" scale="3" resid="Icon.25" />
+
+                    <bt:Image size="32" scale="1" resid="Icon.32" />
+                    <bt:Image size="32" scale="2" resid="Icon.32" />
+                    <bt:Image size="32" scale="3" resid="Icon.32" />
+
+                    <bt:Image size="48" scale="1" resid="Icon.48" />
+                    <bt:Image size="48" scale="2" resid="Icon.48" />
+                    <bt:Image size="48" scale="3" resid="Icon.48" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="MobileTaskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </ExtensionPoint>
+          </MobileFormFactor>
         </Host>
       </Hosts>
       <Resources>
         <bt:Images>
+          <bt:Image id="Icon.25" DefaultValue="{{appUri}}/assets/icon-16.png" />
+          <bt:Image id="Icon.32" DefaultValue="{{appUri}}/assets/icon-16.png" />
+          <bt:Image id="Icon.48" DefaultValue="{{appUri}}/assets/icon-16.png" />
           <bt:Image id="Icon.16x16" DefaultValue="{{appUri}}/assets/icon-16.png" />
           <bt:Image id="Icon.32x32" DefaultValue="{{appUri}}/assets/icon-32.png" />
           <bt:Image id="Icon.80x80" DefaultValue="{{appUri}}/assets/icon-80.png" />
         </bt:Images>
         <bt:Urls>
+          <bt:Url id="MobileTaskpane.Url" DefaultValue="{{appUri}}/activity/taskpane" />
           <bt:Url id="OutlookCmds.Url" DefaultValue="{{appUri}}/outlook/index.html" />
           <bt:Url id="Taskpane.Url" DefaultValue="{{appUri}}/activity/taskpane" />
         </bt:Urls>
