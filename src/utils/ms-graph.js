@@ -36,15 +36,41 @@ async function validateJwt(authHeader) {
     } catch (error) {
       throw error;
     }
-
   }
 }
+export const getAdminToken = async () => {
+  const formParams = {
+    client_id: process.env.AZURE_AD_CLIENTID,
+    client_secret: process.env.AZURE_AD_SECRET,
+    grant_type: "client_credentials",
+    scope: "https://graph.microsoft.com/.default",
+  };
 
+  const stsDomain = "https://login.microsoftonline.com";
+  const tenant = process.env.AZURE_AD_TENANTID;
+  const tokenURLSegment = "oauth2/v2.0/token";
+  const encodedForm = form(formParams);
+
+  const tokenResponse = await fetch(`${stsDomain}/${tenant}/${tokenURLSegment}`, {
+    method: "POST",
+    body: encodedForm,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+  const json = await tokenResponse.json();
+  if (json.error) {
+    throw new Error("Error Code: " + json.error + "; Microsoft Graph error " + JSON.stringify(json));
+  }
+
+  return json;
+};
 export async function getGraphData(accessToken, apiUrl, customHeaderProps) {
   return new Promise((resolve, reject) => {
     const options = {
       host: domain,
-      path: "/" + version + apiUrl,
+      path: "/" + version + encodeURI(apiUrl),
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -91,10 +117,6 @@ export async function getGraphData(accessToken, apiUrl, customHeaderProps) {
   });
 }
 
-/**
- * Calls Office auth getAccessToken & authenticates user on backend
- * @returns MS User with access token
- */
 export const handleAuth = async () => {
   try {
     // eslint-disable-next-line no-undef
@@ -129,11 +151,7 @@ export const handleAuth = async () => {
 
   return null;
 };
-/**
- * Used by API
- * @param {*} authorization
- * @returns
- */
+
 export async function getAccessToken(authorization) {
   if (!authorization) {
     throw new Error("No Authorization header was found.");

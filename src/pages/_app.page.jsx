@@ -34,8 +34,6 @@ function MyFallbackComponent({ error, resetErrorBoundary }) {
 }
 export default function App({ Component, pageProps }) {
   const [loadedOffice, setLoadedOffice] = useState(false);
-  const [d, setD] = useState(null);
-  const forceUpdate = React.useCallback(() => setLoadedOffice(true), []);
   return (
     <>
       <ErrorBoundary
@@ -61,9 +59,7 @@ export default function App({ Component, pageProps }) {
           crossOrigin="anonymous"
           onLoad={() => {
             Office.initialize = (reason) => {
-              setD(`initialize: ${reason}`);
               setLoadedOffice(true);
-              forceUpdate();
             };
           }}
         ></Script>
@@ -80,7 +76,6 @@ export default function App({ Component, pageProps }) {
           <QueryClientProvider client={queryClient}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <Loading center isLoading={loadedOffice == false} />
-              {d}
               {loadedOffice ? <Component {...pageProps} /> : null}
             </LocalizationProvider>
           </QueryClientProvider>

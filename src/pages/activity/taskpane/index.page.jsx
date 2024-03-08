@@ -176,10 +176,42 @@ const fetchActiveEmployeeByEmail = (email) =>
     }
   }`).then(({ activeEmployeeByEmail }) => activeEmployeeByEmail);
 
-const getUniqueEmailBodyAsText = (msUser, messageId) =>
-  getGraphData(msUser.auth.access_token, `/users/${msUser.id}/messages/${messageId}?$select=uniqueBody`, { Prefer: 'outlook.body-content-type="text"' });
+const getUserByEmail = (email) =>
+  fetch(`/api/office/getUserByEmail`, {
+    body: JSON.stringify({
+      email,
+    }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
 
-const getEmailAsEml = (msUser, messageId) => getGraphData(msUser.auth.access_token, `/users/${msUser.id}/messages/${messageId}/$value`);
+const getUniqueEmailBodyAsText = (userId, messageId) =>
+  fetch(`/api/office/getEmailUniqueContents`, {
+    body: JSON.stringify({
+      userId,
+      messageId,
+    }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
+
+const getEmailAsEml = (userId, messageId) =>
+  fetch(`/api/office/getRawEmail`, {
+    body: JSON.stringify({
+      userId,
+      messageId,
+    }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.text())
+    .then((data) => data);
 
 //#endregion
 
@@ -226,18 +258,18 @@ const useSearchEmployees = (value) =>
   );
 const useInsertActivity = () => useMutation({ mutationFn: (args) => insertActivityMutation(args) });
 
-export const useAuthUser = (enabled) => useQuery("user-auth", () => handleAuth(), { enabled, staleTime: 150 * 1000, refetchInterval: 150 * 1000 });
+export const useAuthUser = (email) => useQuery("msgraph-user", () => getUserByEmail(email), { enabled: email != null });
 
 const useFetchActiveEmployeeByEmail = (email) => useQuery(`active-employee-${email}`, () => fetchActiveEmployeeByEmail(email), { enabled: email != null });
 
-const useGetEmailUniqueBodyAsText = (currentMSUser, messageId) =>
-  useQuery(`email-unique-body-${messageId}`, () => getUniqueEmailBodyAsText(currentMSUser, encodeURIComponent(messageId)), {
-    enabled: false,
+const useGetEmailUniqueBodyAsText = (userId, messageId) =>
+  useQuery(`email-unique-body-${messageId}`, () => getUniqueEmailBodyAsText(userId, encodeURIComponent(messageId)), {
+    enabled: userId != null,
     staleTime: Infinity,
   });
 
-const useGetRawEmailContents = (currentMSUser, messageId) =>
-  useQuery(`raw-email-${messageId}`, () => getEmailAsEml(currentMSUser, encodeURIComponent(messageId)), { enabled: false, staleTime: Infinity });
+const useGetRawEmailContents = (userId, messageId) =>
+  useMutation(`raw-email-${messageId}`, () => getEmailAsEml(userId, encodeURIComponent(messageId)), { enabled: userId != null, staleTime: Infinity });
 
 const usePostAttachments = () => useMutation({ mutationFn: (args) => postAttachments(args) });
 
@@ -388,15 +420,16 @@ const App = () => {
     isLoading: loadingMsUserInitial,
     isError: currentMsUserIsError,
     error: currentMsUserError,
-  } = useAuthUser(officeIsReady);
+  } = useAuthUser(Office?.context?.mailbox?.userProfile?.emailAddress);
   const {
     data: activeEmployee,
     isError: activeEmployeeIsError,
     isFetched: activeEmployeeIsFetched,
     isLoading: activeEmployeeIsLoading,
   } = useFetchActiveEmployeeByEmail(currentMSUser?.mail);
-  const { isFetching: fetchingEmailUniqueBody, refetch: fetchEmailUniqueBody } = useGetEmailUniqueBodyAsText(currentMSUser, emailItem?.itemId);
-  const { isFetching: fetchingEmailRawContents, refetch: fetchEmailRawContents } = useGetRawEmailContents(currentMSUser, emailItem?.itemId);
+  const { isFetching: fetchingEmailUniqueBody, refetch: fetchEmailUniqueBody } = useGetEmailUniqueBodyAsText(currentMSUser?.id, emailItem?.itemId);
+  const { isLoading: fetchingEmailRawContents, mutateAsync: fetchEmailRawContents } = useGetRawEmailContents(currentMSUser?.id, emailItem?.itemId);
+
   const { mutateAsync: postAttachmentsAsync, isSuccess: postAttachmentsSuccess } = usePostAttachments();
   //#endregion
 
@@ -451,16 +484,8 @@ const App = () => {
   const officeOnReadyCallback = useCallback(() => {
     if (officeIsReady) return;
     if (!Office.context.mailbox) return;
-    // Office.context.mailbox.item.to; //array [{emailAddress,displayName}]
-    // Office.context.mailbox.item.bcc; //array [{emailAddress,displayName}]
-    // Office.context.mailbox.item.cc; //array [{emailAddress,displayName}]
-    // Office.context.mailbox.item.from; // object {emailAddress,displayName }
     setOfficeIsReady(true);
     setEmailItem(Office.context.mailbox.item);
-    //userProfile
-    //console.log(Office.context.mailbox);
-    //Office.context.mailbox.getCallbackTokenAsync((d) => console.log(d));
-    formik.setFieldValue("subject", Office.context.mailbox.item.normalizedSubject);
     formik.setFieldValue("workEffortDate", dayjs(new Date(Office.context.mailbox.item.dateTimeCreated)));
   }, [officeIsReady]);
   useEffect(() => {
@@ -470,17 +495,18 @@ const App = () => {
   //#endregion
 
   //#region Helper Methods
-  const isWorkEffortAvailable = (value) => toTrimAndLowerCase(value) === "plansponsor";
+  const isWorkEffortAvailable = (value) => ["plansponsor", "consultant", "investmentmanager", "client"].includes(toTrimAndLowerCase(value));
   const showLoading = () => workEffortTypesLoading || formik.isSubmitting || officeIsReady == false || loadingMsUserInitial || fetchingEmailRawContents;
   const canSubmit = () => formik.isSubmitting === false && showLoading() === false;
 
   const copyEmailUniqueBodyToPublicComments = async () => {
     const { data } = await fetchEmailUniqueBody();
+    formik.setFieldValue("subject", data?.subject);
     formik.setFieldValue("commentsClob", data?.uniqueBody?.content);
   };
 
   const addEmailAsAttachment = async () => {
-    const { data } = await fetchEmailRawContents();
+    const data = await fetchEmailRawContents(currentMSUser?.id, emailItem?.itemId);
     const blob = new Blob([data], { type: "message/rfc822" });
     const emlFile = new File([blob], "Email.eml", { type: "message/rfc822" });
     setEmailAsAttachment(emlFile);

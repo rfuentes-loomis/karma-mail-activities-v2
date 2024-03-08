@@ -122,7 +122,7 @@
         </bt:Images>
         <bt:Urls>
           <bt:Url id="MobileTaskpane.Url"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/test" />
+            DefaultValue="https://karma-mail-api.azurewebsites.net/activity/taskpane" />
           <bt:Url id="Commands.Url"
             DefaultValue="https://karma-mail-api.azurewebsites.net/outlook/index.html" />
           <bt:Url id="Taskpane.Url"

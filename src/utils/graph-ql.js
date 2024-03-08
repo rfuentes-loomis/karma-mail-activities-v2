@@ -38,7 +38,6 @@ export const applyMutation = (api, args, responseKeys = ["description", "status"
       },
     },
   });
-  // console.log("query", query);
   return request(query);
 };
 
@@ -52,7 +51,6 @@ const cleanPayload = (payload) => {
     }),
     {}
   );
-  // console.log("cleanedPayload", ret);
   return ret;
 };
 
