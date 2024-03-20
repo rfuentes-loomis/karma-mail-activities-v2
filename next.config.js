@@ -2,8 +2,6 @@
 const nextConfig = {
   reactStrictMode: false,
   pageExtensions: ["page.jsx", "page.js"],
-  distDir: "build",
-  output: "standalone",
   async rewrites() {
     return [
       {
@@ -11,7 +9,7 @@ const nextConfig = {
         destination: "/public/outlook/index.html",
       },
       {
-        source: "/api/graphql/:path*",
+        source: "/api/dharma/:path*",
         destination: `${process.env.DHARMA_PROXY}:path*`,
       },
     ];

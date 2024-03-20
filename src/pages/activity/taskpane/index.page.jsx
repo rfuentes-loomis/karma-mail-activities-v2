@@ -216,7 +216,7 @@ const getEmailAsEml = (userId, messageId) =>
 //#endregion
 
 //#region React Query Hooks
-const useWorkEffortTypes = () => useQuery("WorkEffortTypes", fetchWorkEffortTypes);
+export const useWorkEffortTypes = () => useQuery("WorkEffortTypes", fetchWorkEffortTypes);
 const useWorkEffortCategoryByEffortType = (typeId) =>
   useQuery(`workCategoryByTypeId-${typeId}`, () => fetchWorkEffortCategoryByEffortType(typeId), { enabled: !!typeId });
 const useSearchDynamicEntity = (entityQueryMap, value) => {

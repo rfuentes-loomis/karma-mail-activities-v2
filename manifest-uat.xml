@@ -10,11 +10,11 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Loomis Activity Plugin UAT" />
   <Description DefaultValue="Loomis Activity Plugin UAT" />
-  <IconUrl DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-64.png" />
-  <HighResolutionIconUrl DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-128.png" />
+  <IconUrl DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-64.png" />
+  <HighResolutionIconUrl DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-128.png" />
   <SupportUrl DefaultValue="https://www.loomis.com/help" />
   <AppDomains>
-    <AppDomain>https://karma-mail-api.azurewebsites.net</AppDomain>
+    <AppDomain>https://vnisdashoutlookuat.azurewebsites.net</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox" />
@@ -27,7 +27,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://karma-mail-api.azurewebsites.net/activity/taskpane" />
+        <SourceLocation DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/activity/taskpane" />
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -108,25 +108,25 @@
       <Resources>
         <bt:Images>
           <bt:Image id="Icon.25"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-16.png" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-16.png" />
           <bt:Image id="Icon.32"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-16.png" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-16.png" />
           <bt:Image id="Icon.48"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-16.png" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-16.png" />
           <bt:Image id="Icon.16x16"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-16.png" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-16.png" />
           <bt:Image id="Icon.32x32"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-32.png" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-32.png" />
           <bt:Image id="Icon.80x80"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/assets/icon-80.png" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/assets/icon-80.png" />
         </bt:Images>
         <bt:Urls>
           <bt:Url id="MobileTaskpane.Url"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/activity/taskpane" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/activity/taskpane" />
           <bt:Url id="Commands.Url"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/outlook/index.html" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/outlook/index.html" />
           <bt:Url id="Taskpane.Url"
-            DefaultValue="https://karma-mail-api.azurewebsites.net/activity/taskpane" />
+            DefaultValue="https://vnisdashoutlookuat.azurewebsites.net/activity/taskpane" />
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Loomis Outlook Add-in" />
@@ -139,7 +139,7 @@
       </Resources>
       <WebApplicationInfo>
         <Id>82d1df69-d8ea-4fd1-985c-87a7ac41dac3</Id>
-        <Resource>api://karma-mail-api.azurewebsites.net/82d1df69-d8ea-4fd1-985c-87a7ac41dac3</Resource>
+        <Resource>api://vnisdashoutlookuat.azurewebsites.net/82d1df69-d8ea-4fd1-985c-87a7ac41dac3</Resource>
         <Scopes>
           <Scope>User.Read</Scope>
           <Scope>profile</Scope>

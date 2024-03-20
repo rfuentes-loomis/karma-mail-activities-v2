@@ -1,8 +1,8 @@
 name: Build and Deploy VN UAT
 on:
   workflow_dispatch:
-  push:
-    branches: ["uat"]
+  #push:
+    #branches: ["uat"]
 jobs:
   build_deploy_uat:
     runs-on: ubuntu-latest

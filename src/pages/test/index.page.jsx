@@ -1,6 +1,6 @@
 "use client";
 import Box from "@mui/material/Box";
-import { useAuthUser } from "../activity/taskpane/index.page";
+import { useAuthUser, useWorkEffortTypes } from "../activity/taskpane/index.page";
 import { useCallback, useState, useEffect } from "react";
 function Home() {
   const [officeIsReady, setOfficeIsReady] = useState(false);
@@ -8,7 +8,7 @@ function Home() {
   const [userProfile, setUserProfile] = useState(null);
   const [tokenResponse, setTokenResponse] = useState(null);
   const [tokenResponseError, setTokenResponseError] = useState(null);
-
+  const { data: workEffortTypes, isLoading: workEffortTypesLoading } = useWorkEffortTypes();
   const {
     data: currentMSUser,
     isFetching: loadingMsUser,

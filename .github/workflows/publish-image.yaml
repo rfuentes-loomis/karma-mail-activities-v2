@@ -1,0 +1,42 @@
+name: Build and Deploy VN UAT
+on:
+  workflow_dispatch:
+  #push:
+    #branches: ["uat"]
+jobs:
+  publish_image:
+    runs-on: ubuntu-latest
+    #environment: vaughan-nelson-uat
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and push image
+      id: build-image
+      run: |
+        az acr build --image ${{ secrets.REGISTRY_LOGIN_SERVER }}/karma-mail:latest --registry ${{ secrets.REGISTRY_LOGIN_SERVER }} --file "Dockerfile" .
+    # docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/karma-mail:${{ github.sha }}
+    # docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/karma-mail:${{ github.sha }}
+      - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/karma-mail:latest
+          registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: aci-sampleapp
+          location: 'west us'
+      # - uses: docker/build-push-action@v2
+      #   with:
+      #     push: true
+      #     context: .
+      #     secrets: |
+      #     "github_token=${{ secrets.GITHUB_TOKEN }}"

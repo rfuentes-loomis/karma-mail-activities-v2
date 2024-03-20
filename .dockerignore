@@ -1,0 +1,27 @@
+# Ignore  directory
+node_modules
+bash-scripts
+.github
+docs
+
+# Ignore build artifacts
+.next
+build
+
+
+# Ignore development files
+*.log
+*.pid
+
+
+# Ignore editor-specific files
+.vscode
+.idea
+server.js
+README.md
+*.xml
+*.eml
+.env.local
+
+# Ignore OS-specific files
+.DS_Store
