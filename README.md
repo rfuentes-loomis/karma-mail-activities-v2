@@ -7,3 +7,5 @@ First, run the development server:
 ```bash
 npm run dev
 ```
+
+docker buildx build . --platform linux/amd64

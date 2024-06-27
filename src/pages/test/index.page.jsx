@@ -2,6 +2,7 @@
 import Box from "@mui/material/Box";
 import { useAuthUser, useWorkEffortTypes } from "../activity/taskpane/index.page";
 import { useCallback, useState, useEffect } from "react";
+import { handleAuth } from "../../utils/ms-graph";
 function Home() {
   const [officeIsReady, setOfficeIsReady] = useState(false);
   const [emailItem, setEmailItem] = useState(null);
@@ -16,6 +17,8 @@ function Home() {
     isError: currentMsUserIsError,
     error: currentMsUserError,
   } = useAuthUser(officeIsReady);
+
+  console.log(currentMSUser);
   const officeOnReadyCallback = useCallback(() => {
     if (officeIsReady) return;
     setEmailItem(Office?.context?.mailbox?.item);
@@ -37,6 +40,16 @@ function Home() {
       setTokenResponseError({ error, msg: "we got an error" });
     }
   };
+
+  useEffect(() => {
+    if (!officeIsReady) return;
+    const fetchData = async () => {
+      const data = await handleAuth();
+      console.log(data);
+    };
+
+    fetchData();
+  }, [officeIsReady]);
 
   return (
     <Box>
