@@ -10,11 +10,12 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Loomis Activity Plugin UAT" />
   <Description DefaultValue="Loomis Activity Plugin UAT" />
-  <IconUrl DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-64.png" />
-  <HighResolutionIconUrl DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-128.png" />
+  <IconUrl DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-64.png" />
+  <HighResolutionIconUrl DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-128.png" />
   <SupportUrl DefaultValue="https://www.loomis.com/help" />
   <AppDomains>
-    <AppDomain>https://ls-isdashoutlook-sba-uat.azurewebsites.net/</AppDomain>
+    <AppDomain>https://www.loomis.com</AppDomain>
+    <AppDomain>https://ls-isdashoutlook-sba-uat.azurewebsites.net</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox" />
@@ -27,7 +28,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//activity/taskpane" />
+        <SourceLocation DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/activity/taskpane" />
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -49,9 +50,14 @@
       <Hosts>
         <Host xsi:type="MailHost">
           <DesktopFormFactor>
+            <!-- Process Item event, File and function declaration below -->
             <FunctionFile resid="Commands.Url" />
-            <!-- Message Read -->
-            <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <!-- <ExtensionPoint xsi:type="Events">
+              <Event Type="ItemSend" FunctionExecution="synchronous"
+                FunctionName="validateOnSend" />
+            </ExtensionPoint> -->
+            <!-- Message Compose -->
+            <!-- <ExtensionPoint xsi:type="MessageComposeCommandSurface">
               <OfficeTab id="TabDefault">
                 <Group id="msgComposeGroup">
                   <Label resid="GroupLabel" />
@@ -72,8 +78,30 @@
                   </Control>
                 </Group>
               </OfficeTab>
+            </ExtensionPoint> -->
+            <!-- Message Read -->
+            <ExtensionPoint xsi:type="MessageReadCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="msgReadGroup">
+                  <Label resid="GroupLabel" />
+                  <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                    <Label resid="TaskpaneButton.Label" />
+                    <Supertip>
+                      <Title resid="TaskpaneButton.Label" />
+                      <Description resid="TaskpaneButton.Tooltip" />
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16x16" />
+                      <bt:Image size="32" resid="Icon.32x32" />
+                      <bt:Image size="80" resid="Icon.80x80" />
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="Taskpane.Url" />
+                    </Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
             </ExtensionPoint>
-
           </DesktopFormFactor>
           <!-- Mobile -->
           <MobileFormFactor>
@@ -107,30 +135,21 @@
       </Hosts>
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.25"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-16.png" />
-          <bt:Image id="Icon.32"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-16.png" />
-          <bt:Image id="Icon.48"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-16.png" />
-          <bt:Image id="Icon.16x16"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-16.png" />
-          <bt:Image id="Icon.32x32"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-32.png" />
-          <bt:Image id="Icon.80x80"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//assets/icon-80.png" />
+          <bt:Image id="Icon.25" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-16.png" />
+          <bt:Image id="Icon.32" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-16.png" />
+          <bt:Image id="Icon.48" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-16.png" />
+          <bt:Image id="Icon.16x16" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-16.png" />
+          <bt:Image id="Icon.32x32" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-32.png" />
+          <bt:Image id="Icon.80x80" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/assets/icon-80.png" />
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="MobileTaskpane.Url"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//activity/taskpane" />
-          <bt:Url id="Commands.Url"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//outlook/index.html" />
-          <bt:Url id="Taskpane.Url"
-            DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net//activity/taskpane" />
+          <bt:Url id="MobileTaskpane.Url" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/activity/taskpane" />
+          <bt:Url id="Commands.Url" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/outlook/index.html" />
+          <bt:Url id="Taskpane.Url" DefaultValue="https://ls-isdashoutlook-sba-uat.azurewebsites.net/activity/taskpane" />
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Loomis Outlook Add-in" />
-          <bt:String id="TaskpaneButton.Label" DefaultValue="Loomis Activity" />
+          <bt:String id="TaskpaneButton.Label" DefaultValue="Show Taskpane" />
         </bt:ShortStrings>
         <bt:LongStrings>
           <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a task pane." />
@@ -138,8 +157,8 @@
         </bt:LongStrings>
       </Resources>
       <WebApplicationInfo>
-        <Id>82d1df69-d8ea-4fd1-985c-87a7ac41dac3</Id>
-        <Resource>api://vnisdashoutlookuat.azurewebsites.net/82d1df69-d8ea-4fd1-985c-87a7ac41dac3</Resource>
+        <Id>7f4c222f-891d-4883-8a18-18a3f0bbf3ed</Id>
+        <Resource>api://ls-isdashoutlook-sba-uat.azurewebsites.net/7f4c222f-891d-4883-8a18-18a3f0bbf3ed</Resource>
         <Scopes>
           <Scope>User.Read</Scope>
           <Scope>profile</Scope>

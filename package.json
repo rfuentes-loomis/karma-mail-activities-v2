@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "uat-manifest": "./bash-scripts/create-manifest.sh manifest-uat.xml 'https://karma-mail-api.azurewebsites.net' '82d1df69-d8ea-4fd1-985c-87a7ac41dac3' 'api://karma-mail-api.azurewebsites.net/82d1df69-d8ea-4fd1-985c-87a7ac41dac3' UAT",
+    "uat-manifest": "./bash-scripts/create-manifest.sh manifest-uat.xml 'https://ls-isdashoutlook-sba-uat.azurewebsites.net' '7f4c222f-891d-4883-8a18-18a3f0bbf3ed' 'api://ls-isdashoutlook-sba-uat.azurewebsites.net/7f4c222f-891d-4883-8a18-18a3f0bbf3ed' UAT 5121b922-8864-411c-8186-7ff219e3546f",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
