@@ -4,7 +4,7 @@
   xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
   xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
   xsi:type="MailApp">
-  <Id>5121b922-8864-411c-8186-7ff219e3546f</Id>
+  <Id>d880b752-7522-417b-9226-9ab00f2c33d4</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>loomis</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
@@ -151,7 +151,7 @@
           
           <bt:Url id="MobileTaskpane.Url" DefaultValue="https://localhost:3001/activity/taskpane" />
           <bt:Url id="OutlookCmds.Url" DefaultValue="https://localhost:3001/outlook/index.html" />
-          <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3001/test" />
+          <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3001/activity/taskpane" />
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="Loomis Outlook Add-in" />

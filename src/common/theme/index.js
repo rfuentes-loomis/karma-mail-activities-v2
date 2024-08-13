@@ -3,6 +3,10 @@ import { createTheme } from "@mui/material/styles";
 const Theme = createTheme({
   spacing: 2,
   palette: {
+    mode: "light",
+    background: {
+      default: "white",
+    },
     primary: {
       light: "#759ab3",
       main: "#0c3b6d",
@@ -15,17 +19,7 @@ const Theme = createTheme({
     },
   },
   typography: {
-    fontFamily: [
-      "Source Sans Pro",
-      "Open Sans",
-      "Lato",
-      "Roboto",
-      "Avenir",
-      '"Segoe UI"',
-      "Arial",
-      "Tahoma",
-      "sans-serif",
-    ].join(","),
+    fontFamily: ["Source Sans Pro", "Open Sans", "Lato", "Roboto", "Avenir", '"Segoe UI"', "Arial", "Tahoma", "sans-serif"].join(","),
     fontSize: 14,
   },
 });

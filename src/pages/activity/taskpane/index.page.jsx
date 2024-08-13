@@ -37,7 +37,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
 import Modal from "@mui/material/Modal";
-
+import { jsPDF } from "jspdf";
 //#endregion
 
 //#region Graph QL query definition
@@ -213,6 +213,18 @@ const getEmailAsEml = (userId, messageId) =>
     .then((response) => response.text())
     .then((data) => data);
 
+const getEmailAsHtml = (userId, messageId) =>
+  fetch(`/api/office/getHtmlEmail`, {
+    body: JSON.stringify({
+      userId,
+      messageId,
+    }),
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
+
 //#endregion
 
 //#region React Query Hooks
@@ -270,6 +282,12 @@ const useGetEmailUniqueBodyAsText = (userId, messageId) =>
 
 const useGetRawEmailContents = (userId, messageId) =>
   useMutation(`raw-email-${messageId}`, () => getEmailAsEml(userId, encodeURIComponent(messageId)), { enabled: userId != null, staleTime: Infinity });
+
+const useGetEmailAsHtml = (userId, messageId) =>
+  useQuery(`email-html-body-${messageId}`, () => getEmailAsHtml(userId, encodeURIComponent(messageId)), {
+    enabled: userId != null,
+    staleTime: Infinity,
+  });
 
 const usePostAttachments = () => useMutation({ mutationFn: (args) => postAttachments(args) });
 
@@ -429,7 +447,7 @@ const App = () => {
   } = useFetchActiveEmployeeByEmail(currentMSUser?.mail);
   const { isFetching: fetchingEmailUniqueBody, refetch: fetchEmailUniqueBody } = useGetEmailUniqueBodyAsText(currentMSUser?.id, emailItem?.itemId);
   const { isLoading: fetchingEmailRawContents, mutateAsync: fetchEmailRawContents } = useGetRawEmailContents(currentMSUser?.id, emailItem?.itemId);
-
+  const { isLoading: fetchingEmailAsHTML, refetch: fetchEmailAsHTML } = useGetEmailAsHtml(currentMSUser?.id, emailItem?.itemId);
   const { mutateAsync: postAttachmentsAsync, isSuccess: postAttachmentsSuccess } = usePostAttachments();
   //#endregion
 
@@ -442,7 +460,7 @@ const App = () => {
 
   //#endregion
 
-  //#region Fetch Current User handle defaults
+  //#region Fetch Current User handle defaults values on load
   useEffect(() => {
     if (activeEmployeeIsLoading || loadingMsUser) return;
 
@@ -480,7 +498,7 @@ const App = () => {
   ]);
   //#endregion
 
-  //#region Handle Office On Ready & set Default values
+  //#region Handle Office On Ready
   const officeOnReadyCallback = useCallback(() => {
     if (officeIsReady) return;
     if (!Office.context.mailbox) return;
@@ -506,10 +524,39 @@ const App = () => {
   };
 
   const addEmailAsAttachment = async () => {
-    const data = await fetchEmailRawContents(currentMSUser?.id, emailItem?.itemId);
+    /* const data = await fetchEmailRawContents(currentMSUser?.id, emailItem?.itemId);
     const blob = new Blob([data], { type: "message/rfc822" });
     const emlFile = new File([blob], "Email.eml", { type: "message/rfc822" });
-    setEmailAsAttachment(emlFile);
+    setEmailAsAttachment(emlFile);*/
+
+    const { data } = await fetchEmailAsHTML(currentMSUser?.id, emailItem?.itemId);
+    const htmlContent = data?.uniqueBody?.content;
+    const subject = data?.uniqueBody?.subject;
+    if (htmlContent) {
+      const parser = new DOMParser();
+      const domDoc = parser.parseFromString(htmlContent, "text/html");
+      const cleanHtmlStr = domDoc.body.innerHTML;
+      const doc = new jsPDF({
+        orientation: "l",
+        unit: "px",
+        format: "a1",
+        compress: true,
+        putOnlyUsedFonts: true,
+        hotfixes: ["px_scaling"], // an array of hotfix strings to enable
+      });
+      await doc.html(cleanHtmlStr, {
+        x: 0,
+        y: 0,
+        autoPaging: "text",
+        margin: 20,
+        width: 1366,
+        windowWidth: 1366,
+      });
+      const blobPDF = doc.output("blob");
+      const now = new Date();
+      const file = new File([blobPDF], `Email_${now.toISOString()}.pdf`, { type: "application/pdf" });
+      setEmailAsAttachment(file);
+    }
   };
   //#endregion
 
