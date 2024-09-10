@@ -10,10 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: "Login via Azure CLI"
-      #   uses: azure/login@v2
-      #   with:
-      #     creds: ${{ secrets.azure_credentials }}
       - name: "Login ACR"
         uses: azure/docker-login@v2
         with: 
