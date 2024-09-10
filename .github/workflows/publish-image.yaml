@@ -23,5 +23,5 @@ jobs:
       - name: Build and push image
         id: build-image
         run: |
-          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/regnimosssba/karma-mail:latest --f "Dockerfile" 
+          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/regnimosssba/karma-mail:latest -f "Dockerfile" 
           docker push ${{ vars.REGISTRY_LOGIN_SERVER }}/regnimosssba/karma-mail:latest
