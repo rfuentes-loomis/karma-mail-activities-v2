@@ -1,8 +1,8 @@
-name: Build and Deploy UAT
 on:
   workflow_dispatch:
   push:
     branches: ["uat"]
+
 jobs:
   publish_image:
     runs-on: ubuntu-latest
@@ -10,13 +10,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: 'Login via Azure CLI'
+      - name: "Login via Azure CLI"
         uses: azure/login@v1
         with:
           creds: ${{secrets.azure_credentials}}
+
       - name: Build and push image
-      id: build-image
-      run: |
-        az acr build --image ${{ vars.REGISTRY_LOGIN_SERVER }}/regnimosssba/karma-mail:latest --registry ${{ vars.REGISTRY_LOGIN_SERVER }} --file "Dockerfile" .
-    # docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/karma-mail:${{ github.sha }}
-    # docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/karma-mail:${{ github.sha }}
+        id: build-image
+        run: |
+          az acr build --image ${{ vars.REGISTRY_LOGIN_SERVER }}/regnimosssba/karma-mail:${{ github.sha }} --registry ${{ vars.REGISTRY_LOGIN_SERVER }} --file "Dockerfile" .
+
+      - name: Image push status
+        if: steps.build-image.outcome == 'failure'
+        run: |
+          echo "Failed to build and push the image"
+          exit 1
